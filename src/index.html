@@ -57,7 +57,9 @@
       .button-container {
         text-align: center;
         position: absolute;
-        bottom: 40px
+        bottom: 40px;
+        display:flex;
+        gap: 5px;
       }
 
       #game-ui {
@@ -80,6 +82,10 @@
         user-select: none;
       }
 
+      .button:hover {
+        transform: rotate3d(1, 1, 1, -5deg);
+
+      }
       .button.active {
         transform: translateY(4px);
       }
