@@ -17,7 +17,6 @@ const minifiedIndex = (await minify(index,
         removeStyleLinkTypeAttributes: true,
         useShortDoctype: true }
 )).replace(/\<script type=module src=src\/index.js>\<\/script\>/,'');
-console.log(minifiedIndex);
 const inputs = [{
     action: "eval",
     type: "js",
