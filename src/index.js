@@ -653,7 +653,7 @@ function update(timestep) {
 
         ball.update(timestep);
 
-        if (!ball.falling && !currentLevel.solved) ball.alpha = 1.0;
+        // if (!ball.falling && !currentLevel.solved) ball.alpha = 1.0;
 
         for (let j = 0; j < currentLevel.balls.length; j++) {
             if (i === j) continue;
@@ -806,6 +806,7 @@ function checkHoleCollisions(ball) {
 
         if (distance <= (hole.radius - ball.radius) && velocityMagnitude < BALL_MADE_THRESHOLD) {
             ball.hole = hole;
+            ball.falling = true;
         } else if (circlesIntersect(ball, hole)) {
             const gravity = normalizedAmountOfCircleOverlap(ball, hole) * .2;
             const forceX = gravity * dx / distance;
@@ -817,6 +818,7 @@ function checkHoleCollisions(ball) {
             ball.falling = true;
         }
     }
+    if (!ball.falling) ball.alpha = 1.0;
 }
 
 const FIXED_TIMESTEP = 1000 / 60;  // 60 updates per second
