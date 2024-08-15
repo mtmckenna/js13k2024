@@ -54,8 +54,8 @@ class Level05 extends Level {
         this.holes = [new Hole(400, 125), new Hole(400, 375)];
         this.balls = [new Ball(150, 125), new Ball(250, 375, Math.PI)];
         this.walls = [
-            new Wall(5, 0, 5, 500, false),
-            new Wall(495, 0, 495, 500, false)
+            new Wall(25, 0, 25, 500, false),
+            new Wall(475, 0, 475, 500, false)
         ];
     }
 }
