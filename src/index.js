@@ -653,7 +653,7 @@ function update(timestep) {
 
         ball.update(timestep);
 
-        if (!ball.falling) ball.alpha = 1.0;
+        if (!ball.falling && !currentLevel.solved) ball.alpha = 1.0;
 
         for (let j = 0; j < currentLevel.balls.length; j++) {
             if (i === j) continue;
@@ -679,7 +679,7 @@ function update(timestep) {
 
 
     if (currentLevel.solved) {
-        currentLevel.transitioningAway = true;
+        // currentLevel.transitioningAway = true; // TODO: maybe we don't need transitioningAway?
 
         currentCircleRadius -= CIRCLE_SHRINK_RATE;
 
@@ -746,7 +746,9 @@ function checkBumpCollision(ball) {
 
         const collision = calculateSeparation(ball, bump);
         if (collision) {
-            ball.timeFactor = .1;
+            ball.friction = 0.075;
+        } else {
+            ball.friction = 0.0;
         }
     }
 }
