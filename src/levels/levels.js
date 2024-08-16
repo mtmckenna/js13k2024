@@ -185,15 +185,16 @@ class Level10 extends Level {
     constructor() {
         super();
         this.holes = [
-            new Hole(100, 100),
+            new Hole(200, 200),
             new Hole(400, 400)
         ];
         this.balls = [
-            new Ball(250, 200, 0),
-            new Ball(300, 250, -Math.PI/2),
+            new Ball(250, 250, 0),
+            new Ball(300, 300, Math.PI/2),
         ];
         this.walls = [
-            new Wall(400, 400, 200, 300, false),
+            // new Wall(300, 400, 400, 300, false),
+            new Wall(100, 200, 200, 100, false),
         ];
     }
 }
