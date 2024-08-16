@@ -102,24 +102,6 @@ class Level07 extends Level {
     }
 }
 
-// class Level08 extends Level {
-//     backgroundColor = "#374d93";
-//
-//     constructor() {
-//         super();
-//         this.holes = [new Hole(250, 250)];
-//         const d = 150;
-//         this.balls = [
-//             new Ball(250 + d, 250, 0),
-//             new Ball(250 + d * Math.cos(Math.PI / 3), 250 + d * Math.sin(Math.PI / 3), Math.PI / 3),
-//             new Ball(250 + d * Math.cos(2 * Math.PI / 3), 250 + d * Math.sin(2 * Math.PI / 3), 2 * Math.PI / 3),
-//             new Ball(250 + d * Math.cos(Math.PI), 250 + 50 * Math.sin(Math.PI), Math.PI),
-//             new Ball(250 + d * Math.cos(4 * Math.PI / 3), 250 + d * Math.sin(4 * Math.PI / 3), 4 * Math.PI / 3),
-//             new Ball(250 + d * Math.cos(5 * Math.PI / 3), 250 + d * Math.sin(5 * Math.PI / 3), 5 * Math.PI / 3)
-//         ];
-//     }
-// }
-
 class Level08 extends Level {
     backgroundColor = "#374d93";
 
@@ -139,13 +121,17 @@ class Level09 extends Level {
 
     constructor() {
         super();
-        this.holes = [new Hole(250, 250)];
+        this.holes = [
+            new Hole(250, 300),
+            new Hole(200, 250)
+        ];
         this.balls = [
-            new Ball(50, 250, 0),
-            new Ball(450, 250, Math.PI),
+            new Ball(250, 200, 0),
+            new Ball(300, 250, -Math.PI/2),
         ];
         this.walls = [
-            new Wall(200, 200, 200, 300, false),
+            new Wall(200, 200, 300, 300, false),
+            new Wall(300, 200, 200, 300, false),
             // new Wall(300, 200, 300, 300, false),
         ];
     }

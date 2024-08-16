@@ -746,7 +746,7 @@ function checkBumpCollision(ball) {
 
         const collision = calculateSeparation(ball, bump);
         if (collision) {
-            ball.friction = 0.075;
+            ball.friction = 0.09;
         } else {
             ball.friction = 0.0;
         }
