@@ -1,7 +1,50 @@
-import Level from "../level.js";
 import Ball from "../ball.js";
 import Hole from "../hole.js";
 import Wall from "../wall.js";
+
+export class Level {
+    balls = [];
+    walls = [];
+    holes = [];
+    bumps = [];
+    transitioningAway = false;
+    backgroundColor = "#557ad9";
+    cssBackgroundColor = "red";
+    cssButtonColor = "red";
+    cssButtonShadowColor = "red";
+    cssUiBackgroundColor = "red";
+    textColor = "#ffffff";
+    width = 500;
+    height = 500;
+    hit = false;
+
+    reset() {
+        this.hit = false;
+        this.transitioningAway = false;
+        this.balls.forEach(ball => {
+            ball.reset()
+        });
+
+        this.walls.forEach(wall => {
+            wall.reset();
+        });
+
+        document.getElementById("js-place-wall").classList.remove('disabled');
+        document.getElementById("js-place-wall").setAttribute('disabled', false);
+
+        document.body.style.backgroundColor = this.cssBackgroundColor;
+    }
+
+    get solved() {
+        for (let i = 0; i < this.balls.length; i++) {
+            if (!this.balls[i].hole) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+}
 
 class Level01 extends Level {
     backgroundColor = "#8eb087";
@@ -132,7 +175,25 @@ class Level09 extends Level {
         this.walls = [
             new Wall(200, 200, 300, 300, false),
             new Wall(300, 200, 200, 300, false),
-            // new Wall(300, 200, 300, 300, false),
+        ];
+    }
+}
+
+class Level10 extends Level {
+    backgroundColor = "#374d93";
+
+    constructor() {
+        super();
+        this.holes = [
+            new Hole(100, 100),
+            new Hole(400, 400)
+        ];
+        this.balls = [
+            new Ball(250, 200, 0),
+            new Ball(300, 250, -Math.PI/2),
+        ];
+        this.walls = [
+            new Wall(400, 400, 200, 300, false),
         ];
     }
 }
@@ -146,6 +207,6 @@ export const generateLevels = () => [
     new Level06(),
     new Level07(),
     new Level08(),
-    new Level09()
+    new Level09(),
+    new Level10()
 ];
-

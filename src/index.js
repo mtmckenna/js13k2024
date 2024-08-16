@@ -248,6 +248,7 @@ function hitBallReleaseCallback() {
 
 function placeWallPointReleaseCallback() {
     if (wallPoint.vertices.length < 2) return;
+    console.log(wallPoint);
 
     if (global.inputMode === INPUT_MODES.wall) {
         currentLevel.walls.push(new Wall(
@@ -344,8 +345,9 @@ function moveHitBallCallback() {
 }
 
 function moveWallPointClickCallback() {
-    wallPoint.vertices[wallPoint.vertices.length - 1].x = joystick.currentPos.x;
-    wallPoint.vertices[wallPoint.vertices.length - 1].y = joystick.currentPos.y;
+    // TODO: delete function?
+    // wallPoint.vertices[wallPoint.vertices.length - 1].x = joystick.currentPos.x;
+    // wallPoint.vertices[wallPoint.vertices.length - 1].y = joystick.currentPos.y;
 }
 
 function angleFromJoystick(joystick) {
@@ -571,12 +573,16 @@ function draw() {
                 const angle = Math.atan2(dy, dx) * 180 / Math.PI;
                 global.ui.innerText = `${angle.toFixed(0)}`;
                 if (angle === -0) global.ui.innerText = "0";
+                // console log the points to the console
+                // console.log(wall.vertices[0].x, wall.vertices[0].y, joystick.currentPos.x, joystick.currentPos.y);
             } else {
                 const dx = wall.vertices[1].x - wall.vertices[0].x;
                 const dy = wall.vertices[1].y - wall.vertices[0].y;
                 const angle = Math.atan2(dy, dx) * 180 / Math.PI;
                 global.ui.innerText = `${angle.toFixed(0)}`;
                 if (angle === -0) global.ui.innerText = "0";
+                // console log the points to the console
+                // console.log(wall.vertices[0].x, wall.vertices[0].y, wall.vertices[1].x, wall.vertices[1].y);
             }
 
             global.ui.style.color = getTextColorForBackground(...rgbFromRgba(currentLevel.backgroundColor));
@@ -890,6 +896,7 @@ window.addEventListener("mousemove", (e) => {
         let x = e.clientX - rect.left;
         let y = e.clientY - rect.top;
         const wall = currentLevel.walls[i];
+        console.log(wall);
 
         x /= getCanvasScalingFactor();
         y /= getCanvasScalingFactor();
