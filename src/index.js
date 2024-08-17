@@ -554,7 +554,7 @@ function draw() {
         const arrow = arrows[i];
         const ball = currentLevel.balls[i];
         if (ball.hole) continue;
-        drawArrow(ctx, arrow.startPos.x, arrow.startPos.y, arrow.endPos.x, arrow.endPos.y);
+        drawArrow(arrow);
     }
 
 
@@ -581,7 +581,6 @@ function draw() {
                 const angle = Math.atan2(dy, dx) * 180 / Math.PI;
                 global.ui.innerText = `${angle.toFixed(0)}`;
                 if (angle === -0) global.ui.innerText = "0";
-                // console.log(wall.vertices[0].x, wall.vertices[0].y, joystick.currentPos.x, joystick.currentPos.y);
             } else {
                 const dx = wall.vertices[1].x - wall.vertices[0].x;
                 const dy = wall.vertices[1].y - wall.vertices[0].y;
@@ -598,7 +597,42 @@ function draw() {
     }
 }
 
-function drawArrow(ctx, fromx, fromy, tox, toy) {
+function drawArrow(arrow) {
+    drawSingleArrow(ctx, arrow.startPos.x, arrow.startPos.y, arrow.endPos.x, arrow.endPos.y);
+
+    const xMagnitude = Math.abs(arrow.startPos.x - arrow.endPos.x);
+    const yMagnitude = Math.abs(arrow.startPos.y - arrow.endPos.y);
+
+    let mirrorXStart = arrow.startPos.x;
+    let mirrorXEnd = arrow.endPos.x;
+    let mirrorYStart = arrow.startPos.y;
+    let mirrorYEnd = arrow.endPos.y;
+
+    if (arrow.endPos.x < 0) {
+        mirrorXStart = arrow.startPos.x + canvas.width;
+        mirrorXEnd = mirrorXStart - xMagnitude;
+    }
+
+    if (arrow.endPos.x > canvas.width) {
+        mirrorXStart = arrow.startPos.x - canvas.width;
+        mirrorXEnd = mirrorXStart + xMagnitude;
+    }
+
+    if (arrow.endPos.y < 0) {
+        mirrorYStart = arrow.startPos.y + canvas.height;
+        mirrorYEnd = mirrorYStart - yMagnitude;
+    }
+
+    if (arrow.endPos.y > canvas.height) {
+        mirrorYStart = arrow.startPos.y - canvas.height;
+        mirrorYEnd = mirrorYStart + yMagnitude;
+    }
+
+    drawSingleArrow(ctx, mirrorXStart, mirrorYStart, mirrorXEnd, mirrorYEnd);
+
+}
+
+function drawSingleArrow(ctx, fromx, fromy, tox, toy) {
     const magnitude = calculateMagnitude(fromx, fromy, tox, toy);
     var headlen = Math.min(magnitude, 20);  // length of head in pixels
     var angle = Math.atan2(toy - fromy, tox - fromx);
