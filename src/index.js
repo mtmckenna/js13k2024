@@ -31,6 +31,8 @@ let global = {
 };
 global.ui = document.getElementById("game-ui");
 global.title = document.getElementById("title-container");
+global.holeNumber = document.getElementById("hole-number");
+global.canvasContainer = document.getElementById("canvas-container");
 document.getElementById("js-hit-ball").addEventListener("click", (e) => {
     e.preventDefault();
     if (e.currentTarget.classList.contains("disabled")) return;
@@ -83,35 +85,41 @@ function getCanvasScalingFactor() {
 const preWall = new Wall(0, 0, 0, 0, true, true);
 
 const levels = generateLevels();
-const a = [.5, .5, .5];
-const b = [.5, .5, .5];
-const c = [2.0,1.0,0.0];
-const d = [0.5, 0.2, 0.25];
+// const a = [.5, .5, .5];
+// const b = [.5, .5, .5];
+// const c = [2.0,1.0,0.0];
+// const d = [0.5, 0.2, 0.25];
 
-for (let i = 0; i < levels.length; i++) {
-    const t = i / levels.length;
-    const t2 = (i + 1) / levels.length;
-    const t3 = (i + 2) / levels.length;
-    levels[i].backgroundColor = getColor(t, a, b, c, d);
-    levels[i].cssBackgroundColor = getColor(t2, a, b, c, d);
-
-    const buttonColor = getColor(t3, a, b, c, d);
-    // make a shadow color that is slightly darker than the button color BASED ON BUTTON COLOR
-    const shadowColor = getColor(t3, a, b, c, d).slice(5).split(",").map((v, i) => {
-        if (i === 3) return 1.0;
-        return Math.max(parseFloat(v)/2, 0.0);
-    }).join(",");
-
-    // make a UI background color that is the background color but slightly darker
-    const uiColor = getColor(t3, a, b, c, d).slice(5).split(",").map((v, i) => {
-        if (i === 3) return 0.5;
-        return Math.max(parseFloat(v)/2, 0.0);
-    }).join(",");
-    levels[i].cssButtonColor = buttonColor;
-    levels[i].cssButtonShadowColor = `rgba(${shadowColor})`;
-    levels[i].textColor = getTextColorForBackground(...rgbFromRgba(buttonColor));
-    levels[i].cssUiBackgroundColor = `rgba(${uiColor})`;
-}
+// for (let i = 0; i < levels.length; i++) {
+//     const t = i / levels.length + .01;
+//     // const t2 = ((i + 1) % levels.length) / levels.length + .01;
+//     // const t3 = ((i + 2) % levels.length) / levels.length + .01;
+//
+//     const t2 = ((i + levels.length / 2) % levels.length) / levels.length + .01;
+//     const t3 = ((i + 2) % levels.length) / levels.length + .01;
+//
+//     levels[i].backgroundColor = getColor(t, a, b, c, d);
+//     levels[i].cssBackgroundColor = getColor(t2, a, b, c, d);
+//     levels[i].cssHoleNumberColor = levels[i].cssBackgroundColor;
+//     levels[i].cssHoleNumberBackgroundColor = levels[i].backgroundColor;
+//
+//     const buttonColor = getColor(t3, a, b, c, d);
+//     // make a shadow color that is slightly darker than the button color BASED ON BUTTON COLOR
+//     const shadowColor = getColor(t3, a, b, c, d).slice(5).split(",").map((v, i) => {
+//         if (i === 3) return 1.0;
+//         return Math.max(parseFloat(v)/2, 0.0);
+//     }).join(",");
+//
+//     // make a UI background color that is the background color but slightly darker
+//     const uiColor = getColor(t3, a, b, c, d).slice(5).split(",").map((v, i) => {
+//         if (i === 3) return 0.5;
+//         return Math.max(parseFloat(v)/2, 0.0);
+//     }).join(",");
+//     levels[i].cssButtonColor = buttonColor;
+//     levels[i].cssButtonShadowColor = `rgba(${shadowColor})`;
+//     levels[i].textColor = getTextColorForBackground(...rgbFromRgba(buttonColor));
+//     levels[i].cssUiBackgroundColor = `rgba(${uiColor})`;
+// }
 
 let currentLevelIndex = 0;
 let nextLevelIndex = (currentLevelIndex + 1) % levels.length;
@@ -487,9 +495,10 @@ function drawHole(hole) {
 }
 
 function drawLevel(level) {
-    ctx.fillStyle = level.backgroundColor;
-    // ctx.fillStyle = "#8d8d8d";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    global.canvasContainer.style.backgroundColor = level.backgroundColor;
+    global.holeNumber.style.color = level.cssBackgroundColor;
+    global.holeNumber.innerText = `${currentLevelIndex + 1}`;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < level.holes.length; i++) {
         const hole = level.holes[i];
         drawHole(hole);
@@ -579,11 +588,10 @@ function draw() {
                 const angle = Math.atan2(dy, dx) * 180 / Math.PI;
                 global.ui.innerText = `${angle.toFixed(0)}`;
                 if (angle === -0) global.ui.innerText = "0";
-                // console.log(wall.vertices[0].x, wall.vertices[0].y, wall.vertices[1].x, wall.vertices[1].y);
             }
 
-            global.ui.style.color = getTextColorForBackground(...rgbFromRgba(currentLevel.backgroundColor));
-            global.ui.style.backgroundColor = currentLevel.cssUiBackgroundColor;
+            global.ui.style.color = getTextColorForBackground(...hexToRgb(currentLevel.cssButtonColor));
+            global.ui.style.backgroundColor = currentLevel.cssButtonColor;
         } else {
             global.ui.style.backgroundColor = null;
         }
@@ -783,7 +791,7 @@ function globalReset() {
     Array.from(document.getElementsByClassName("button")).forEach(button => {
             button.style.backgroundColor = currentLevel.cssButtonColor;
             button.style.boxShadow = `0 5px ${currentLevel.cssButtonShadowColor}`;
-            button.style.color = currentLevel.textColor;
+            button.style.color = getTextColorForBackground(...hexToRgb(currentLevel.cssButtonColor));
 
     });
 
@@ -850,21 +858,16 @@ function getLevelFromHash() {
 }
 
 
-// https://iquilezles.org/articles/palettes/
-function getColor(t, a, b, c, d)
-{
-    const color = [0,0,0];
-    for (let i = 0; i < 3; i++) {
-        color[i] = a[i] + b[i]*Math.cos(6.28318*(c[i] * t + d[i]));
-    }
-
-    return `rgba(${color[0] * 255}, ${color[1] * 255}, ${color[2] * 255}, 1.0)`;
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return  result ? [
+        parseInt(result[1], 16),
+        parseInt(result[2], 16),
+        parseInt(result[3], 16)
+    ] : null;
 }
 
-function rgbFromRgba(rgba) {
-    const parts = rgba.slice(5).split(",").map(parseFloat);
-    return parts.slice(0, 3);
-}
+
 function calculateBrightness(r, g, b) {
     return 0.299 * r + 0.587 * g + 0.114 * b;
 }

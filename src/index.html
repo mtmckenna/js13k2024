@@ -32,16 +32,37 @@
         align-items: center;
       }
 
+      #canvas-container {
+        max-width: 100%;
+        max-height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
       #canvas {
         max-width: 100%;
         max-height: 100%;
-        background-color: rgb(128, 128, 128);
+        background-color: rgba(0, 0, 0, 0.0);
         image-rendering: pixelated;
         cursor: crosshair;
+        z-index: 2;
       }
 
+      #hole-number {
+        max-width: 100%;
+        max-height: 100%;
+        position: absolute;
+        font-size: 60vw;
+        line-height: 1;
+      }
 
       @media (orientation: portrait) {
+        #canvas-container {
+          width: 100%;
+          height: auto;
+        }
+
         #canvas {
           width: 100%;
           height: auto;
@@ -49,10 +70,16 @@
       }
 
       @media (orientation: landscape) {
+        #canvas-container {
+          height: 100%;
+          width: auto;
+        }
+
         #canvas {
           height: 100%;
           width: auto;
         }
+
       }
 
       .button-container {
@@ -61,6 +88,7 @@
         bottom: 40px;
         display:flex;
         gap: 5px;
+        z-index: 3;
       }
 
       #game-ui {
@@ -180,7 +208,11 @@
   <body>
 
   <div class="container">
-    <canvas id="canvas" height=500 width=500></canvas>
+    <div id="canvas-container">
+      <canvas id="canvas" height=500 width=500></canvas>
+      <div id="hole-number"></div>
+
+    </div>
     <div id="title-container">
       <span class="letter">E</span>
       <span class="letter">n</span>
