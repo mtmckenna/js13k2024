@@ -565,10 +565,8 @@ function draw() {
     if (global.inputMode & INPUT_MODES.moving) {
         let wall;
         if (global.inputMode & INPUT_MODES.moveHandle) {
-            // ctx.fillText("handle", 10, 30);
             wall = global.selectedWall;
         } else if (global.inputMode & INPUT_MODES.placeAny) {
-            // ctx.fillText("place", 10, 30);
             wall = wallPoint;
         }
 
@@ -579,13 +577,13 @@ function draw() {
                 const dx = joystick.currentPos.x - wall.vertices[0].x;
                 const dy = joystick.currentPos.y - wall.vertices[0].y;
                 const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-                global.ui.innerText = `${angle.toFixed(0)}`;
+                global.ui.innerText = `${angle.toFixed(0)}°`;
                 if (angle === -0) global.ui.innerText = "0";
             } else {
                 const dx = wall.vertices[1].x - wall.vertices[0].x;
                 const dy = wall.vertices[1].y - wall.vertices[0].y;
                 const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-                global.ui.innerText = `${angle.toFixed(0)}`;
+                global.ui.innerText = `${angle.toFixed(0)}°`;
                 if (angle === -0) global.ui.innerText = "0";
             }
 
@@ -594,6 +592,18 @@ function draw() {
         } else {
             global.ui.style.backgroundColor = null;
         }
+    }
+
+    if (global.inputMode === INPUT_MODES.hit && arrows.length > 0) {
+        console.log("HI");
+        const arrow = arrows[0];
+        const magnitude = calculateMagnitude(arrow.startPos.x, arrow.startPos.y, arrow.endPos.x, arrow.endPos.y);
+        const angle = Math.atan2(arrow.endPos.y - arrow.startPos.y, arrow.endPos.x - arrow.startPos.x);
+        global.ui.innerText = `${(angle * 180 / Math.PI).toFixed(0)}° | ${magnitude.toFixed(0)}`;
+        global.ui.style.color = getTextColorForBackground(...hexToRgb(currentLevel.cssButtonColor));
+        global.ui.style.backgroundColor = currentLevel.cssButtonColor;
+    } else {
+        global.ui.style.backgroundColor = null;
     }
 }
 
