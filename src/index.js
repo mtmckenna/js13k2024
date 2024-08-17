@@ -7,6 +7,7 @@ import {generateLevels} from "./levels/levels.js";
 
 const BALL_MADE_THRESHOLD = 0.25;
 const BALL_STOPPED_THRESHOLD = 0.15
+const MIN_WALL_LENGTH = 2;
 
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
@@ -136,7 +137,6 @@ const joystick = new Joystick(canvas, clickCallback, releaseCallback, moveCallba
 let wallPoint = new WallPoint();
 
 function clickCallback() {
-    // global.title.style.display = "none";
     global.title.style.opacity = 0;
     for (let i = 0; i < currentLevel.walls.length; i++) {
         const wall = currentLevel.walls[i];
@@ -255,7 +255,16 @@ function hitBallReleaseCallback() {
 }
 
 function placeWallPointReleaseCallback() {
+
+    const mag = calculateMagnitude(wallPoint.vertices[0].x, wallPoint.vertices[0].y, joystick.currentPos.x, joystick.currentPos.y);
+    if (mag < MIN_WALL_LENGTH && wallPoint.vertices.length === 1) {
+        return;
+    }
+
+
+    wallPoint.vertices.push({x: joystick.currentPos.x, y: joystick.currentPos.y});
     if (wallPoint.vertices.length < 2) return;
+
 
     if (global.inputMode === INPUT_MODES.wall) {
         currentLevel.walls.push(new Wall(
@@ -276,8 +285,7 @@ function placeWallPointReleaseCallback() {
         ));
     }
 
-        wallPoint = new WallPoint();
-
+    wallPoint = new WallPoint();
 }
 
 function moveCallback() {
@@ -351,8 +359,9 @@ function moveHitBallCallback() {
     }
 }
 
+// TODO: delete
 function moveWallPointClickCallback() {
-    // TODO: delete function?
+    //runs when tapping and holding
     // wallPoint.vertices[wallPoint.vertices.length - 1].x = joystick.currentPos.x;
     // wallPoint.vertices[wallPoint.vertices.length - 1].y = joystick.currentPos.y;
 }
@@ -595,7 +604,6 @@ function draw() {
     }
 
     if (global.inputMode === INPUT_MODES.hit && arrows.length > 0) {
-        console.log("HI");
         const arrow = arrows[0];
         const magnitude = calculateMagnitude(arrow.startPos.x, arrow.startPos.y, arrow.endPos.x, arrow.endPos.y);
         const angle = Math.atan2(arrow.endPos.y - arrow.startPos.y, arrow.endPos.x - arrow.startPos.x);
