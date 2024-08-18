@@ -28,12 +28,16 @@ let global = {
     selectedWall: null,
     selectedVertex: null,
     inputMode: INPUT_MODES.hit,
-    lastInputMode: INPUT_MODES.hit
+    lastInputMode: INPUT_MODES.hit,
+    lastUiText: "",
+    currentUiText: ""
 };
 global.ui = document.getElementById("game-ui");
 global.title = document.getElementById("title-container");
 global.holeNumber = document.getElementById("hole-number");
 global.canvasContainer = document.getElementById("canvas-container");
+global.prevButton = document.getElementById("js-prev");
+global.nextButton = document.getElementById("js-next");
 document.getElementById("js-hit-ball").addEventListener("click", (e) => {
     e.preventDefault();
     if (e.currentTarget.classList.contains("disabled")) return;
@@ -73,8 +77,20 @@ document.getElementById("js-place-bump").addEventListener("click", (e) => {
 
 document.getElementById("js-reset").addEventListener("click", (e) => {
     e.preventDefault();
-    currentLevel.reset();
+    currentLevelReset();
     globalReset();
+});
+
+global.prevButton.addEventListener("click", (e) => {
+    e.preventDefault();
+    if (e.currentTarget.classList.contains("disabled")) return;
+    goToLevel(currentLevelIndex);
+});
+
+global.nextButton.addEventListener("click", (e) => {
+    e.preventDefault();
+    if (e.currentTarget.classList.contains("disabled")) return;
+    goToLevel(currentLevelIndex + 2);
 });
 
 function getCanvasScalingFactor() {
@@ -84,43 +100,7 @@ function getCanvasScalingFactor() {
 }
 
 const preWall = new Wall(0, 0, 0, 0, true, true);
-
 const levels = generateLevels();
-// const a = [.5, .5, .5];
-// const b = [.5, .5, .5];
-// const c = [2.0,1.0,0.0];
-// const d = [0.5, 0.2, 0.25];
-
-// for (let i = 0; i < levels.length; i++) {
-//     const t = i / levels.length + .01;
-//     // const t2 = ((i + 1) % levels.length) / levels.length + .01;
-//     // const t3 = ((i + 2) % levels.length) / levels.length + .01;
-//
-//     const t2 = ((i + levels.length / 2) % levels.length) / levels.length + .01;
-//     const t3 = ((i + 2) % levels.length) / levels.length + .01;
-//
-//     levels[i].backgroundColor = getColor(t, a, b, c, d);
-//     levels[i].cssBackgroundColor = getColor(t2, a, b, c, d);
-//     levels[i].cssHoleNumberColor = levels[i].cssBackgroundColor;
-//     levels[i].cssHoleNumberBackgroundColor = levels[i].backgroundColor;
-//
-//     const buttonColor = getColor(t3, a, b, c, d);
-//     // make a shadow color that is slightly darker than the button color BASED ON BUTTON COLOR
-//     const shadowColor = getColor(t3, a, b, c, d).slice(5).split(",").map((v, i) => {
-//         if (i === 3) return 1.0;
-//         return Math.max(parseFloat(v)/2, 0.0);
-//     }).join(",");
-//
-//     // make a UI background color that is the background color but slightly darker
-//     const uiColor = getColor(t3, a, b, c, d).slice(5).split(",").map((v, i) => {
-//         if (i === 3) return 0.5;
-//         return Math.max(parseFloat(v)/2, 0.0);
-//     }).join(",");
-//     levels[i].cssButtonColor = buttonColor;
-//     levels[i].cssButtonShadowColor = `rgba(${shadowColor})`;
-//     levels[i].textColor = getTextColorForBackground(...rgbFromRgba(buttonColor));
-//     levels[i].cssUiBackgroundColor = `rgba(${uiColor})`;
-// }
 
 let currentLevelIndex = 0;
 let nextLevelIndex = (currentLevelIndex + 1) % levels.length;
@@ -240,6 +220,8 @@ function hitBallReleaseCallback() {
     document.getElementById("js-hit-ball").classList.add("disabled");
     document.getElementById("js-place-wall").classList.add("disabled");
     document.getElementById("js-place-bump").classList.add("disabled");
+    global.nextButton.classList.add("disabled");
+    global.prevButton.classList.add("disabled");
     const resetButton = document.getElementById("js-reset");
     resetButton.classList.remove("disabled");
 
@@ -251,7 +233,7 @@ function hitBallReleaseCallback() {
 
     resetButton.style.backgroundColor = currentLevel.cssButtonColor;
     resetButton.style.boxShadow = `0 5px ${currentLevel.cssButtonShadowColor}`;
-    resetButton.style.color = currentLevel.textColor;
+    resetButton.style.color = getTextColorForBackground(...hexToRgb(currentLevel.cssButtonColor));;
 }
 
 function placeWallPointReleaseCallback() {
@@ -291,13 +273,10 @@ function placeWallPointReleaseCallback() {
 function moveCallback() {
     if (global.inputMode === INPUT_MODES.hit) {
         moveHitBallCallback();
-    } else if (global.inputMode & INPUT_MODES.placeAny && joystick.pressed) {
-        moveWallPointClickCallback();
     } else if (global.inputMode === INPUT_MODES.moveHandle) {
         moveHandleCallback();
     } else if (global.inputMode === INPUT_MODES.moveWall) {
         moveWallCallback();
-
     }
 }
 
@@ -357,14 +336,13 @@ function moveHitBallCallback() {
         arrow.angle = angle;
         arrow.magnitude = magnitude;
     }
+
+    const arrow = arrows[0];
+    const magnitude = calculateMagnitude(arrow.startPos.x, arrow.startPos.y, arrow.endPos.x, arrow.endPos.y);
+    const angle = Math.atan2(arrow.endPos.y - arrow.startPos.y, arrow.endPos.x - arrow.startPos.x);
+    global.currentUiText = `${(angle * 180 / Math.PI).toFixed(0)}° | ${magnitude.toFixed(0)}`;
 }
 
-// TODO: delete
-function moveWallPointClickCallback() {
-    //runs when tapping and holding
-    // wallPoint.vertices[wallPoint.vertices.length - 1].x = joystick.currentPos.x;
-    // wallPoint.vertices[wallPoint.vertices.length - 1].y = joystick.currentPos.y;
-}
 
 function angleFromJoystick(joystick) {
     return Math.atan2(
@@ -569,7 +547,6 @@ function draw() {
 
     ctx.fillStyle = "white";
     ctx.font = "30px Arial";
-    global.ui.innerText = "";
 
     if (global.inputMode & INPUT_MODES.moving) {
         let wall;
@@ -604,14 +581,18 @@ function draw() {
     }
 
     if (global.inputMode === INPUT_MODES.hit && arrows.length > 0) {
-        const arrow = arrows[0];
-        const magnitude = calculateMagnitude(arrow.startPos.x, arrow.startPos.y, arrow.endPos.x, arrow.endPos.y);
-        const angle = Math.atan2(arrow.endPos.y - arrow.startPos.y, arrow.endPos.x - arrow.startPos.x);
-        global.ui.innerText = `${(angle * 180 / Math.PI).toFixed(0)}° | ${magnitude.toFixed(0)}`;
+        let uiString = ""
+        console.log(global.lastUiText);
+        if (global.lastUiText.length > 0) {
+            uiString = `<span class="prev-ui-text">${global.lastUiText}</span> <br />`;
+        }
+        uiString += global.currentUiText;
+        global.ui.innerHTML = uiString;
         global.ui.style.color = getTextColorForBackground(...hexToRgb(currentLevel.cssButtonColor));
         global.ui.style.backgroundColor = currentLevel.cssButtonColor;
     } else {
         global.ui.style.backgroundColor = null;
+        global.ui.innerText = "";
     }
 }
 
@@ -763,7 +744,7 @@ function update(timestep) {
             }
 
             if (global.stillAt !== null && Date.now() - global.stillAt > 1000) {
-                currentLevel.reset();
+                currentLevelReset();
                 globalReset();
             }
         }
@@ -823,9 +804,13 @@ function goToLevel(levelNum) {
     nextLevel = levels[nextLevelIndex]
     currentCircleRadius = MAX_CIRCLE_RADIUS;
     currentLevel.reset();
-    globalReset();
     location.hash = `#/${currentLevelIndex + 1}`;
 
+
+
+    globalReset();
+    global.lastUiText = "";
+    global.currentUiText = "";
 }
 
 function globalReset() {
@@ -840,16 +825,31 @@ function globalReset() {
     const jsReset =document.getElementById("js-reset")
     jsReset.classList.add("disabled");
 
+    global.prevButton.classList.remove("disabled");
+    global.nextButton.classList.remove("disabled");
+    if (currentLevelIndex === 0) {
+        global.prevButton.classList.add("disabled");
+    }
+
+    if (currentLevelIndex === levels.length - 1) {
+        global.nextButton.classList.add("disabled");
+    }
+
     Array.from(document.getElementsByClassName("button")).forEach(button => {
-            button.style.backgroundColor = currentLevel.cssButtonColor;
-            button.style.boxShadow = `0 5px ${currentLevel.cssButtonShadowColor}`;
-            button.style.color = getTextColorForBackground(...hexToRgb(currentLevel.cssButtonColor));
+            let backgroundColor = currentLevel.cssButtonColor;
+            let shadowColor = `0 5px ${currentLevel.cssButtonShadowColor}`;;
+            let textColor = getTextColorForBackground(...hexToRgb(currentLevel.cssButtonColor));;
 
+            if (!button.classList.contains("disabled")) {
+                button.style.backgroundColor = backgroundColor;
+                button.style.boxShadow =  shadowColor;
+                button.style.color = textColor;
+            } else {
+                button.style.backgroundColor = null;
+                button.style.boxShadow = null;
+                button.style.color = null;
+            }
     });
-
-    jsReset.style.backgroundColor = null;
-    jsReset.style.boxShadow = null;
-    jsReset.style.color = null;
 
     global.stillAt = null;
     global.selectedWall = null;
@@ -984,3 +984,8 @@ window.addEventListener("mousemove", (e) => {
 
     canvas.style.cursor = pointer;
 });
+
+function currentLevelReset() {
+    global.lastUiText = global.currentUiText;
+    currentLevel.reset();
+}

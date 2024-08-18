@@ -83,6 +83,18 @@
 
       }
 
+      #top-container {
+        position: absolute;
+        display: flex;
+        justify-content: space-between;
+        top: 40px;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 0 20px;
+        align-items: center;
+        text-align: center;
+      }
+
       .button-container {
         text-align: center;
         position: absolute;
@@ -92,12 +104,6 @@
         z-index: 3;
       }
 
-      #game-ui {
-        text-align: center;
-        position: absolute;
-        top: 40px;
-        font-size: 20px;
-      }
 
       .button {
         display: inline-block;
@@ -132,6 +138,12 @@
         padding: 10px 20px;
         border: none;
         border-radius: 5px;
+        top: 40px;
+        font-size: 20px;
+      }
+
+      .prev-ui-text {
+        opacity: .30;
       }
 
       #title-container {
@@ -225,14 +237,17 @@
       <span class="letter">l</span>
       <span class="letter">f</span>
     </div>
-    <div id="game-ui"></div>
+    <div id="top-container">
+      <div class="button" id="js-prev"><span class="button-label">Previous</span></div>
+      <div id="game-ui"></div>
+      <div class="button" id="js-next"><span class="button-label">Next</span></div>
+      </div>
     <div class="button-container">
       <div class="button" id="js-hit-ball"><span class="button-label">Hit</span></div>
       <div class="button" id="js-place-wall"><span class="button-label">Wall</span></div>
       <div class="button" id="js-place-bump"><span class="button-label">Bump</span></div>
       <div class="button" id="js-reset"><span class="button-label">Reset</span></div>
     </div>
-    <div id="debug">hi2</div>
   </div>
   <script type="module" src="src/index.js"></script>
 
