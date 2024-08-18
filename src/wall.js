@@ -182,11 +182,7 @@ export default class Wall {
         if (this.broken) {
             this.emitter.draw(ctx);
         } else {
-            if (this.wall) {
-                this.drawWall(ctx);
-            } else {
-                this.drawBump(ctx);
-            }
+            this.drawWall(ctx);
         }
     }
 
@@ -225,47 +221,6 @@ export default class Wall {
 
             ctx.fill();
         }
-    }
-
-    drawBump(ctx) {
-        ctx.beginPath();
-        ctx.fillStyle = `rgba(${this.color}, 0.60)`;
-        ctx.strokeStyle = "#000"
-        ctx.lineWidth = 2;
-
-        ctx.moveTo(this.vertices[0].x, this.vertices[0].y);
-        for (let i = 1; i < this.vertices.length; i++) {
-            ctx.lineTo(this.vertices[i].x, this.vertices[i].y);
-        }
-        ctx.closePath(); // Complete the path by drawing a line to the starting point
-        ctx.setLineDash([5, 5]);
-        ctx.stroke();
-        ctx.fill(); // Fill the path with the current fillStyle
-
-        if (this.color === PLAYER_WALL_COLOR) {
-            ctx.beginPath();
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = 'red';
-            ctx.setLineDash([]);
-            ctx.moveTo(this.pos.x - 5, this.pos.y - 5);
-            ctx.lineTo(this.pos.x + 5, this.pos.y + 5);
-            ctx.moveTo(this.pos.x - 5, this.pos.y + 5);
-            ctx.lineTo(this.pos.x + 5, this.pos.y - 5);
-            ctx.stroke();
-            ctx.closePath();
-
-            // draw circles at the top and the bottom of the wall
-            ctx.beginPath();
-            ctx.fillStyle = 'rgba(255, 0, 0, 1.0)';
-
-            ctx.arc(this.handle1.x, this.handle1.y, HANDLE_RADIUS, 0, 2 * Math.PI);
-            ctx.arc(this.handle2.x, this.handle2.y, HANDLE_RADIUS, 0, 2 * Math.PI);
-
-            ctx.fill();
-        }
-
-        ctx.setLineDash([]);
-
     }
 }
 

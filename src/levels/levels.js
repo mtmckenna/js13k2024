@@ -6,7 +6,6 @@ export class Level {
     balls = [];
     walls = [];
     holes = [];
-    bumps = [];
     transitioningAway = false;
     backgroundColor = "red";
     cssBackgroundColor = "red";

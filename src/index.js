@@ -17,7 +17,7 @@ const INPUT_MODES = {
     wall: 1 << 1,       // 00010
     moveHandle: 1 << 2, // 00100
     moveWall: 1 << 3,   // 01000
-    bump: 1 << 4,       // 10000
+    bump: 1 << 4,       // 10000 UNUSED
     placeAny: (1 << 1) | (1 << 4),
     watching: 1 << 5,
     moving: (1 << 1) | (1 << 2) | (1 << 4)
@@ -45,10 +45,8 @@ document.getElementById("js-hit-ball").addEventListener("click", (e) => {
 
     e.currentTarget.classList.add("active");
     document.getElementById("js-place-wall").classList.remove("active");
-    document.getElementById("js-place-bump").classList.remove("active");
     document.getElementById("js-hit-ball").style.boxShadow = `0 2px ${currentLevel.cssButtonShadowColor}`;
     document.getElementById("js-place-wall").style.boxShadow = `0 5px ${currentLevel.cssButtonShadowColor}`;
-    document.getElementById("js-place-bump").style.boxShadow = `0 5px ${currentLevel.cssButtonShadowColor}`;
 
 });
 document.getElementById("js-place-wall").addEventListener("click", (e) => {
@@ -57,22 +55,8 @@ document.getElementById("js-place-wall").addEventListener("click", (e) => {
     global.inputMode = INPUT_MODES.wall;
     e.currentTarget.classList.add("active");
     document.getElementById("js-hit-ball").classList.remove("active");
-    document.getElementById("js-place-bump").classList.remove("active");
     document.getElementById("js-hit-ball").style.boxShadow = `0 5px ${currentLevel.cssButtonShadowColor}`;
     document.getElementById("js-place-wall").style.boxShadow = `0 2px ${currentLevel.cssButtonShadowColor}`;
-    document.getElementById("js-place-bump").style.boxShadow = `0 5px ${currentLevel.cssButtonShadowColor}`;
-});
-
-document.getElementById("js-place-bump").addEventListener("click", (e) => {
-    e.preventDefault();
-    if (e.currentTarget.classList.contains("disabled")) return;
-    global.inputMode = INPUT_MODES.bump;
-    e.currentTarget.classList.add("active");
-    document.getElementById("js-hit-ball").classList.remove("active");
-    document.getElementById("js-place-wall").classList.remove("active");
-    document.getElementById("js-hit-ball").style.boxShadow = `0 5px ${currentLevel.cssButtonShadowColor}`;
-    document.getElementById("js-place-wall").style.boxShadow = `0 5px ${currentLevel.cssButtonShadowColor}`;
-    document.getElementById("js-place-bump").style.boxShadow = `0 2px ${currentLevel.cssButtonShadowColor}`;
 });
 
 document.getElementById("js-reset").addEventListener("click", (e) => {
@@ -125,28 +109,6 @@ function clickCallback() {
         const vertex = wall.pointInHandle(joystick.currentPos.x, joystick.currentPos.y);
         if (wall.pointInCloseButton(joystick.currentPos.x, joystick.currentPos.y)) {
             currentLevel.walls.splice(i, 1);
-            return;
-        } else if (vertex) {
-            global.lastInputMode = global.inputMode;
-            global.inputMode = INPUT_MODES.moveHandle;
-            global.selectedWall = wall;
-            global.selectedVertex = vertex;
-            return;
-        } else if (wall.isPointInside(joystick.currentPos.x, joystick.currentPos.y)) {
-            global.lastInputMode = global.inputMode;
-            global.inputMode = INPUT_MODES.moveWall;
-            global.selectedWall = wall;
-            global.selectedVertex = null;
-        }
-    }
-
-    for (let i = 0; i < currentLevel.bumps.length; i++) {
-        const wall = currentLevel.bumps[i];
-        if (!wall.player) continue;
-
-        const vertex = wall.pointInHandle(joystick.currentPos.x, joystick.currentPos.y);
-        if (wall.pointInCloseButton(joystick.currentPos.x, joystick.currentPos.y)) {
-            currentLevel.bumps.splice(i, 1);
             return;
         } else if (vertex) {
             global.lastInputMode = global.inputMode;
@@ -219,7 +181,6 @@ function hitBallReleaseCallback() {
     canvas.style.cursor = "not-allowed";
     document.getElementById("js-hit-ball").classList.add("disabled");
     document.getElementById("js-place-wall").classList.add("disabled");
-    document.getElementById("js-place-bump").classList.add("disabled");
     global.nextButton.classList.add("disabled");
     global.prevButton.classList.add("disabled");
     const resetButton = document.getElementById("js-reset");
@@ -247,25 +208,13 @@ function placeWallPointReleaseCallback() {
     wallPoint.vertices.push({x: joystick.currentPos.x, y: joystick.currentPos.y});
     if (wallPoint.vertices.length < 2) return;
 
-
-    if (global.inputMode === INPUT_MODES.wall) {
-        currentLevel.walls.push(new Wall(
-            wallPoint.vertices[0].x,
-            wallPoint.vertices[0].y,
-            wallPoint.vertices[1].x,
-            wallPoint.vertices[1].y,
-            true
-        ));
-    } else if (global.inputMode === INPUT_MODES.bump) {
-        currentLevel.bumps.push(new Wall(
-            wallPoint.vertices[0].x,
-            wallPoint.vertices[0].y,
-            wallPoint.vertices[1].x,
-            wallPoint.vertices[1].y,
-            true,
-            false
-        ));
-    }
+    currentLevel.walls.push(new Wall(
+        wallPoint.vertices[0].x,
+        wallPoint.vertices[0].y,
+        wallPoint.vertices[1].x,
+        wallPoint.vertices[1].y,
+        true
+    ));
 
     wallPoint = new WallPoint();
 }
@@ -496,11 +445,6 @@ function drawLevel(level) {
         wall.draw(ctx);
     }
 
-    for (let i = 0; i < level.bumps.length; i++) {
-        const bump = level.bumps[i];
-        bump.draw(ctx);
-    }
-
     if ((global.inputMode & INPUT_MODES.placeAny) && wallPoint.vertices.length > 0) {
         preWall.setVertices(wallPoint.vertices[0].x, wallPoint.vertices[0].y, joystick.currentPos.x, joystick.currentPos.y);
 
@@ -717,7 +661,6 @@ function update(timestep) {
             checkEdgeCollisions(ball);
             checkHoleCollisions(ball);
             checkWallCollision(ball);
-            checkBumpCollision(ball);
         }
     }
 
@@ -782,21 +725,6 @@ function checkWallCollision(ball) {
     }
 }
 
-
-function checkBumpCollision(ball) {
-    ball.timeFactor = 1.0;
-    for (let i = 0; i < currentLevel.bumps.length; i++) {
-        const bump = currentLevel.bumps[i];
-
-        const collision = calculateSeparation(ball, bump);
-        if (collision) {
-            ball.friction = 0.09;
-        } else {
-            ball.friction = 0.0;
-        }
-    }
-}
-
 function goToLevel(levelNum) {
     currentLevelIndex = (levelNum - 1) % levels.length;
     const nextLevelIndex = (currentLevelIndex + 1) % levels.length;
@@ -816,12 +744,10 @@ function goToLevel(levelNum) {
 function globalReset() {
     document.getElementById("js-hit-ball").classList.add("active");
     document.getElementById("js-place-wall").classList.remove("active");
-    document.getElementById("js-place-bump").classList.remove("active");
     document.getElementById("js-reset").classList.remove("active");
 
     document.getElementById("js-hit-ball").classList.remove("disabled");
     document.getElementById("js-place-wall").classList.remove("disabled");
-    document.getElementById("js-place-bump").classList.remove("disabled");
     const jsReset =document.getElementById("js-reset")
     jsReset.classList.add("disabled");
 
@@ -948,23 +874,6 @@ window.addEventListener("mousemove", (e) => {
         let x = e.clientX - rect.left;
         let y = e.clientY - rect.top;
         const wall = currentLevel.walls[i];
-
-        x /= getCanvasScalingFactor();
-        y /= getCanvasScalingFactor();
-
-        if (wall.pointInCloseButton(x, y)) {
-            pointer = "pointer";
-        } else if (wall.pointInHandle(x, y)) {
-            pointer = "grab";
-        } else if (wall.isPointInside(x, y)) {
-            pointer = "grab";
-        }
-    }
-
-    for (let i = 0; i < currentLevel.bumps.length; i++) {
-        let x = e.clientX - rect.left;
-        let y = e.clientY - rect.top;
-        const wall = currentLevel.bumps[i];
 
         x /= getCanvasScalingFactor();
         y /= getCanvasScalingFactor();
