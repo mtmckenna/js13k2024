@@ -493,7 +493,6 @@ function draw() {
 
 
     ctx.fillStyle = "white";
-    ctx.font = "30px Arial";
 
     if (global.inputMode & INPUT_MODES.moving) {
         let wall;
@@ -503,8 +502,7 @@ function draw() {
             wall = wallPoint;
         }
 
-        // get angle between two vertices in wall (in degrees)
-        if (wall && wall.vertices.length > 0) {
+        if (global.inputMode === INPUT_MODES.wall && wall && wall.vertices.length > 0) {
 
             if (wall.vertices.length === 1) {
                 const dx = joystick.currentPos.x - wall.vertices[0].x;
@@ -527,7 +525,7 @@ function draw() {
         }
     }
 
-    if (global.inputMode === INPUT_MODES.hit && arrows.length > 0) {
+    if (global.inputMode === INPUT_MODES.hit) {
         let uiString = ""
         if (global.lastUiText.length > 0) {
             uiString = `<div class="prev-ui-text">${global.lastUiText}</div>`;
@@ -536,7 +534,7 @@ function draw() {
         global.ui.innerHTML = uiString;
         global.ui.style.color = getTextColorForBackground(...hexToRgb(currentLevel.cssButtonColor));
         global.ui.style.backgroundColor = currentLevel.cssButtonColor;
-    } else {
+    } else if (global.lastUiText.length === 0) {
         global.ui.style.backgroundColor = null;
         global.ui.innerHTML = "";
     }
