@@ -80,7 +80,7 @@ class Level03 extends Level {
     constructor() {
         super();
         this.holes = [new Hole(100, 125), new Hole(400, 375)];
-        this.balls = [new Ball(250, 125), new Ball(250, 375, Math.PI)];
+        this.balls = [new Ball(250, 125), new Ball(250, 375, 0)];
     }
 }
 
@@ -94,7 +94,7 @@ class Level04 extends Level {
     constructor() {
         super();
         this.holes = [new Hole(400, 125), new Hole(400, 375)];
-        this.balls = [new Ball(50, 125), new Ball(250, 375, Math.PI)];
+        this.balls = [new Ball(50, 125), new Ball(250, 375, 0)];
         this.walls = [new Wall(100, 50, 100, 200, false)];
     }
 }
@@ -108,7 +108,7 @@ class Level05 extends Level {
     constructor() {
         super();
         this.holes = [new Hole(400, 125), new Hole(400, 375)];
-        this.balls = [new Ball(150, 125), new Ball(250, 375, Math.PI)];
+        this.balls = [new Ball(150, 125), new Ball(250, 375, 0)];
         this.walls = [
             new Wall(25, 0, 25, 500, false),
             new Wall(475, 0, 475, 500, false)
@@ -193,7 +193,7 @@ class Level09 extends Level {
             new Hole(200, 250)
         ];
         this.balls = [
-            new Ball(250, 200, 0),
+            new Ball(250, 200, -Math.PI),
             new Ball(300, 250, -Math.PI/2),
         ];
         this.walls = [
@@ -215,12 +215,36 @@ class Level10 extends Level {
             new Hole(400, 400)
         ];
         this.balls = [
-            new Ball(250, 250, 0),
-            new Ball(300, 300, Math.PI/2),
+            new Ball(250, 250, -Math.PI),
+            new Ball(300, 300, -Math.PI/2),
         ];
         this.walls = [
             // new Wall(300, 400, 400, 300, false),
             new Wall(100, 200, 200, 100, false),
+        ];
+    }
+}
+
+class Level11 extends Level {
+    backgroundColor = "#FFA9E7";
+    cssBackgroundColor = "#7F2CCB";
+    cssButtonColor = "#FF84E8";
+    cssButtonShadowColor = "#414361";
+    constructor() {
+        super();
+        this.holes = [
+            new Hole(450, 50),
+            new Hole(450, 250),
+            new Hole(450, 475)
+        ];
+        this.balls = [
+            new Ball(250, 200, -Math.PI),
+            new Ball(175, 325, -Math.PI/2),
+            new Ball(325, 325, -Math.PI/3),
+
+        ];
+        this.walls = [
+            // new Wall(100, 200, 200, 100, false),
         ];
     }
 }
@@ -235,5 +259,6 @@ export const generateLevels = () => [
     new Level07(),
     new Level08(),
     new Level09(),
-    new Level10()
+    new Level10(),
+    new Level11(),
 ];

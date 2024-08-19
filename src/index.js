@@ -198,12 +198,11 @@ function hitBallReleaseCallback() {
 }
 
 function placeWallPointReleaseCallback() {
-
+    if (wallPoint.vertices.length === 0) return; // TODO: not sure i like this fix
     const mag = calculateMagnitude(wallPoint.vertices[0].x, wallPoint.vertices[0].y, joystick.currentPos.x, joystick.currentPos.y);
     if (mag < MIN_WALL_LENGTH && wallPoint.vertices.length === 1) {
         return;
     }
-
 
     wallPoint.vertices.push({x: joystick.currentPos.x, y: joystick.currentPos.y});
     if (wallPoint.vertices.length < 2) return;

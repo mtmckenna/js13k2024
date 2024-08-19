@@ -2,7 +2,7 @@ export default class Ball {
 
   mass = 1;
   
-  constructor(x, y, startAngle = 0, radius = 8) {
+  constructor(x, y, startAngle = Math.PI, radius = 8) {
     this.radius = radius;
     this.color = "#fff";
     this.pos = { x, y };
@@ -14,7 +14,6 @@ export default class Ball {
     this.pos.x = x;
     this.pos.y = y;
     this.alpha = 1.0;
-    this.falling = false;
     this.friction = 0;
   }
 
