@@ -135,11 +135,19 @@
       }
 
       #game-ui {
-        padding: 10px 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        height: 2em;
+        line-height: 1em;
+        overflow: hidden;
+        font-size: 20px;
         border: none;
         border-radius: 5px;
+        padding: 5px;
         top: 40px;
-        font-size: 20px;
       }
 
       .prev-ui-text {
@@ -155,6 +163,7 @@
         -webkit-text-stroke: 2px black;
         top: 40px;
         transition: opacity 1s ease-in-out;
+        z-index: 2;
       }
 
       .letter {

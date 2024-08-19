@@ -263,6 +263,9 @@ function moveWallCallback() {
 }
 
 function moveHitBallCallback() {
+    // TODO: I don't like this fix
+    if (arrows.length === 0) return;
+
     let angleOffset = 1;
 
     for (let i = 0; i < arrows.length; i++) {
@@ -526,17 +529,16 @@ function draw() {
 
     if (global.inputMode === INPUT_MODES.hit && arrows.length > 0) {
         let uiString = ""
-        console.log(global.lastUiText);
         if (global.lastUiText.length > 0) {
-            uiString = `<span class="prev-ui-text">${global.lastUiText}</span> <br />`;
+            uiString = `<div class="prev-ui-text">${global.lastUiText}</div>`;
         }
-        uiString += global.currentUiText;
+        uiString += `<div>${global.currentUiText}</div>`;
         global.ui.innerHTML = uiString;
         global.ui.style.color = getTextColorForBackground(...hexToRgb(currentLevel.cssButtonColor));
         global.ui.style.backgroundColor = currentLevel.cssButtonColor;
     } else {
         global.ui.style.backgroundColor = null;
-        global.ui.innerText = "";
+        global.ui.innerHTML = "";
     }
 }
 
