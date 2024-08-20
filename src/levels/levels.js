@@ -238,9 +238,9 @@ class Level11 extends Level {
             new Hole(450, 475)
         ];
         this.balls = [
-            new Ball(250, 200, -Math.PI),
+            new Ball(250, 200, Math.PI),
             new Ball(175, 325, -Math.PI/2),
-            new Ball(325, 325, -Math.PI/3),
+            new Ball(325, 325, -Math.PI/2),
 
         ];
         this.walls = [

@@ -30,7 +30,8 @@ let global = {
     inputMode: INPUT_MODES.hit,
     lastInputMode: INPUT_MODES.hit,
     lastUiText: "",
-    currentUiText: ""
+    currentUiText: "",
+    lastMoveLocation: {x: 0, y: 0}
 };
 global.ui = document.getElementById("game-ui");
 global.title = document.getElementById("title-container");
@@ -102,25 +103,30 @@ let wallPoint = new WallPoint();
 
 function clickCallback() {
     global.title.style.opacity = 0;
-    for (let i = 0; i < currentLevel.walls.length; i++) {
-        const wall = currentLevel.walls[i];
-        if (!wall.player) continue;
+    global.lastMoveLocation.x = joystick.currentPos.x;
+    global.lastMoveLocation.y = joystick.currentPos.y;
 
-        const vertex = wall.pointInHandle(joystick.currentPos.x, joystick.currentPos.y);
-        if (wall.pointInCloseButton(joystick.currentPos.x, joystick.currentPos.y)) {
-            currentLevel.walls.splice(i, 1);
-            return;
-        } else if (vertex) {
-            global.lastInputMode = global.inputMode;
-            global.inputMode = INPUT_MODES.moveHandle;
-            global.selectedWall = wall;
-            global.selectedVertex = vertex;
-            return;
-        } else if (wall.isPointInside(joystick.currentPos.x, joystick.currentPos.y)) {
-            global.lastInputMode = global.inputMode;
-            global.inputMode = INPUT_MODES.moveWall;
-            global.selectedWall = wall;
-            global.selectedVertex = null;
+    if (global.inputMode != INPUT_MODES.watching) {
+        for (let i = 0; i < currentLevel.walls.length; i++) {
+            const wall = currentLevel.walls[i];
+            if (!wall.player) continue;
+
+            const vertex = wall.pointInHandle(joystick.currentPos.x, joystick.currentPos.y);
+            if (wall.pointInCloseButton(joystick.currentPos.x, joystick.currentPos.y)) {
+                currentLevel.walls.splice(i, 1);
+                return;
+            } else if (vertex) {
+                global.lastInputMode = global.inputMode;
+                global.inputMode = INPUT_MODES.moveHandle;
+                global.selectedWall = wall;
+                global.selectedVertex = vertex;
+                return;
+            } else if (wall.isPointInside(joystick.currentPos.x, joystick.currentPos.y)) {
+                global.lastInputMode = global.inputMode;
+                global.inputMode = INPUT_MODES.moveWall;
+                global.selectedWall = wall;
+                global.selectedVertex = null;
+            }
         }
     }
 
@@ -250,14 +256,20 @@ function moveHandleCallback() {
 
 function moveWallCallback() {
     if (global.selectedWall) {
-        const dx = joystick.currentPos.x - global.selectedWall.pos.x;
-        const dy = joystick.currentPos.y - global.selectedWall.pos.y;
+        // incorporate lastClickLocation
+        const dx = joystick.currentPos.x - global.lastMoveLocation.x;
+        const dy = joystick.currentPos.y - global.lastMoveLocation.y;
+        // const dx = joystick.currentPos.x - global.selectedWall.pos.x;
+        // const dy = joystick.currentPos.y - global.selectedWall.pos.y;
         global.selectedWall.setVertices(
             global.selectedWall.v1.x + dx,
             global.selectedWall.v1.y + dy,
             global.selectedWall.v2.x + dx,
             global.selectedWall.v2.y + dy
         )
+
+        global.lastMoveLocation.x = joystick.currentPos.x;
+        global.lastMoveLocation.y = joystick.currentPos.y;
     }
 }
 
