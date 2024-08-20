@@ -249,6 +249,37 @@ class Level11 extends Level {
     }
 }
 
+class Level12 extends Level {
+    backgroundColor = "#FFA9E7";
+    cssBackgroundColor = "#7F2CCB";
+    cssButtonColor = "#FF84E8";
+    cssButtonShadowColor = "#414361";
+    constructor() {
+        super();
+        this.holes = [
+            new Hole(200, 200),
+            new Hole(300, 200),
+        ];
+        this.balls = [
+            new Ball(100, 250, Math.PI),
+            new Ball(400, 250, Math.PI/3),
+        ];
+        this.walls = [
+            new Wall(125, 125, 175, 300, false),
+            new Wall(375, 125, 325, 300, false),
+            new Wall(125, 125, 175, 150, false),
+            new Wall(375, 125, 325, 150, false),
+            new Wall(175, 150, 325, 150,false),
+            new Wall(175, 300, 325, 300,false),
+            // now the cat smile
+            new Wall(200, 250, 200, 275, false),
+            new Wall(300, 250, 300, 275, false),
+            new Wall(200, 275, 300, 275, false),
+
+        ];
+    }
+}
+
 export const generateLevels = () => [
     new Level01(),
     new Level02(),
@@ -261,4 +292,5 @@ export const generateLevels = () => [
     new Level09(),
     new Level10(),
     new Level11(),
+    new Level12(),
 ];
