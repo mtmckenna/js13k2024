@@ -233,14 +233,14 @@ class Level11 extends Level {
     constructor() {
         super();
         this.holes = [
-            new Hole(450, 50),
-            new Hole(450, 250),
-            new Hole(450, 475)
+            new Hole(100, 100),
+            new Hole(250, 100),
+            new Hole(400, 100)
         ];
         this.balls = [
             new Ball(250, 200, Math.PI),
-            new Ball(175, 325, -Math.PI/2),
-            new Ball(325, 325, -Math.PI/2),
+            new Ball(175, 325, Math.PI/4),
+            new Ball(325, 325, -Math.PI/4),
 
         ];
         this.walls = [

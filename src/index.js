@@ -256,11 +256,8 @@ function moveHandleCallback() {
 
 function moveWallCallback() {
     if (global.selectedWall) {
-        // incorporate lastClickLocation
         const dx = joystick.currentPos.x - global.lastMoveLocation.x;
         const dy = joystick.currentPos.y - global.lastMoveLocation.y;
-        // const dx = joystick.currentPos.x - global.selectedWall.pos.x;
-        // const dy = joystick.currentPos.y - global.selectedWall.pos.y;
         global.selectedWall.setVertices(
             global.selectedWall.v1.x + dx,
             global.selectedWall.v1.y + dy,
