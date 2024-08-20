@@ -15,6 +15,7 @@
         background-color: #f0f0f0;
         font-family: 'Arial', sans-serif;
         user-select: none;
+        pointer-events: none;
         transition: background-color 1s ease;
       }
 
@@ -48,6 +49,7 @@
         image-rendering: pixelated;
         cursor: crosshair;
         z-index: 2;
+        pointer-events: all;
       }
 
       #hole-number {
@@ -118,6 +120,7 @@
         cursor: pointer;
         transition: background-color 0.3s, box-shadow 0.3s, transform 0.1s;
         user-select: none;
+        pointer-events: all;
       }
 
       .button:hover {
