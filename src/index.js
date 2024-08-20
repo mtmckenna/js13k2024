@@ -168,6 +168,12 @@ function releaseCallback() {
     global.ui.style.backgroundColor = null;
 }
 
+function translateCanvasContainer(magnitude, angle) {
+    const xMultiplier = -Math.cos(angle) * magnitude * .1;
+    const yMultiplier = Math.sin(angle) * magnitude * .1;
+    global.canvasContainer.style.transform = `translate(${xMultiplier}px, ${yMultiplier}px)`;
+}
+
 function hitBallReleaseCallback() {
     if (arrows.length === 0) return;
     for (let i = 0; i < currentLevel.balls.length; i++) {
@@ -180,7 +186,9 @@ function hitBallReleaseCallback() {
         ball.vel.x = x;
         ball.vel.y = y;
     }
-    triggerShake(arrows[0].angle, false);
+
+    // triggerShake(arrows[0].angle, false, arrows[0].magnitude);
+    triggerRelax(arrows[0].angle, arrows[0].magnitude);
 
     arrows.length = 0;
     currentLevel.hit = true;
@@ -203,6 +211,7 @@ function hitBallReleaseCallback() {
     resetButton.style.boxShadow = `0 5px ${currentLevel.cssButtonShadowColor}`;
     resetButton.style.color = getTextColorForBackground(...hexToRgb(currentLevel.cssButtonColor));;
 
+    global.canvasContainer.style.transform = null;
 }
 
 function placeWallPointReleaseCallback() {
@@ -302,7 +311,8 @@ function moveHitBallCallback() {
     const arrow = arrows[0];
     const magnitude = calculateMagnitude(arrow.startPos.x, arrow.startPos.y, arrow.endPos.x, arrow.endPos.y);
     const angle = Math.atan2(arrow.endPos.y - arrow.startPos.y, arrow.endPos.x - arrow.startPos.x);
-    global.currentUiText = `${(angle * 180 / Math.PI).toFixed(0)}° | ${magnitude.toFixed(0)}`;
+    global.currentUiText = `${(arrow.angle * 180 / Math.PI).toFixed(0)}° | ${magnitude.toFixed(0)}`;
+    translateCanvasContainer(arrow.magnitude, arrow.angle);
 }
 
 
@@ -910,12 +920,12 @@ function currentLevelReset() {
     currentLevel.reset();
 }
 
-function createShakeAnimation(angleInRadians, big = false) {
+function createRelaxAnimation(angleInRadians, magnitude) {
     const styleSheet = document.styleSheets[0];
     const keyframeName = 'shake-animation';
     const shakeClassName = 'shake';
-    const magnitude = big ? 1 : .5;
-    const duration = big ? 1 : .5;
+    const multiplier = .1 * magnitude;
+    const duration = .75;
 
 
     // Remove existing keyframes (if any)
@@ -927,8 +937,63 @@ function createShakeAnimation(angleInRadians, big = false) {
     }
 
     // Calculate the x and y multipliers based on the angle (in radians)
-    const xMultiplier = Math.cos(angleInRadians) * magnitude;
-    const yMultiplier = -Math.sin(angleInRadians) * magnitude;
+    const xMultiplier = -Math.cos(angleInRadians) * multiplier;
+    const yMultiplier = Math.sin(angleInRadians) * multiplier;
+
+    const keyframes = `
+    @keyframes ${keyframeName} {
+      0% { transform: translate(${xMultiplier}px, ${yMultiplier}px); }
+      60% { transform: translate(${xMultiplier * -0.3}px, ${yMultiplier * -0.3}px); }
+      100% { transform: translate(0, 0); }
+    }
+  `;
+
+    // Insert new keyframes rule
+    styleSheet.insertRule(keyframes, styleSheet.cssRules.length);
+
+
+    // Update or add the shake class rule to apply the animation with the specified duration
+    let shakeRuleIndex = -1;
+    for (let i = 0; i < styleSheet.cssRules.length; i++) {
+        if (styleSheet.cssRules[i].selectorText === `.${shakeClassName}`) {
+            shakeRuleIndex = i;
+            break;
+        }
+    }
+
+    const shakeRule = `
+    .${shakeClassName} {
+      animation: ${keyframeName} ${duration}s ease-out;
+    }
+  `;
+
+    if (shakeRuleIndex >= 0) {
+        styleSheet.deleteRule(shakeRuleIndex);
+        styleSheet.insertRule(shakeRule, shakeRuleIndex);
+    } else {
+        styleSheet.insertRule(shakeRule, styleSheet.cssRules.length);
+    }
+}
+
+function createShakeAnimation(angleInRadians) {
+    const styleSheet = document.styleSheets[0];
+    const keyframeName = 'shake-animation';
+    const shakeClassName = 'shake';
+    const multiplier = 1
+    const duration =1;
+
+
+    // Remove existing keyframes (if any)
+    for (let i = 0; i < styleSheet.cssRules.length; i++) {
+        if (styleSheet.cssRules[i].name === keyframeName) {
+            styleSheet.deleteRule(i);
+            break;
+        }
+    }
+
+    // Calculate the x and y multipliers based on the angle (in radians)
+    const xMultiplier = Math.cos(angleInRadians) * multiplier;
+    const yMultiplier = -Math.sin(angleInRadians) * multiplier;
 
     // Create new keyframes
     let keyframes = `
@@ -947,19 +1012,14 @@ function createShakeAnimation(angleInRadians, big = false) {
     }
   `;
 
-    // Create gentler keyframes
-    // Create keyframes with fewer points for a swoopier effect
-    if (!big) {
-            keyframes = `
-        @keyframes ${keyframeName} {
-          0% { transform: translate(0, 0); }
-          20% { transform: translate(${xMultiplier * -8}px, ${yMultiplier * 8}px); }
-          50% { transform: translate(${xMultiplier * 8}px, ${yMultiplier * -8}px); }
-          80% { transform: translate(${xMultiplier * -4}px, ${yMultiplier * 4}px); }
-          100% { transform: translate(0, 0); }
-        }
-      `;
-    }
+    // if (!big) {
+    //         keyframes = `
+    //     @keyframes ${keyframeName} {
+    //       0% { transform: translate(${xMultiplier * 8}px, ${yMultiplier * -8}px); }
+    //       100% { transform: translate(0, 0); }
+    //     }
+    //   `;
+    // }
 
 
     // Insert new keyframes rule
@@ -982,18 +1042,23 @@ function createShakeAnimation(angleInRadians, big = false) {
   `;
 
     if (shakeRuleIndex >= 0) {
-        // Update existing shake class rule
         styleSheet.deleteRule(shakeRuleIndex);
         styleSheet.insertRule(shakeRule, shakeRuleIndex);
     } else {
-        // Add new shake class rule
         styleSheet.insertRule(shakeRule, styleSheet.cssRules.length);
     }
-
 }
 
-function triggerShake(angleInRadians, big = false) {
-    createShakeAnimation(angleInRadians, big);
+function triggerRelax(angleInRadians, magnitude) {
+    createRelaxAnimation(angleInRadians, magnitude);
+    document.getElementById("canvas-container").classList.add('shake');
+    setTimeout(() => {
+        document.getElementById("canvas-container").classList.remove('shake');
+    }, 1000);
+}
+
+function triggerShake(angleInRadians) {
+    createShakeAnimation(angleInRadians);
     document.getElementById("canvas-container").classList.add('shake');
     setTimeout(() => {
         document.getElementById("canvas-container").classList.remove('shake');
