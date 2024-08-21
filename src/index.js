@@ -30,7 +30,9 @@ let global = {
     inputMode: INPUT_MODES.hit,
     lastInputMode: INPUT_MODES.hit,
     lastUiText: "",
-    currentUiText: "",
+    currentHitAngle: "",
+    lastHitAngle: "",
+    currentHoleText:"",
     lastMoveLocation: {x: 0, y: 0}
 };
 global.ui = document.getElementById("game-ui");
@@ -105,6 +107,7 @@ function clickCallback() {
     global.title.style.opacity = 0;
     global.lastMoveLocation.x = joystick.currentPos.x;
     global.lastMoveLocation.y = joystick.currentPos.y;
+    global.ui.innerHTML = global.currentHoleText;
 
     if (global.inputMode != INPUT_MODES.watching) {
         for (let i = 0; i < currentLevel.walls.length; i++) {
@@ -165,7 +168,7 @@ function releaseCallback() {
         global.selectedVertex = null;
     }
 
-    global.ui.style.backgroundColor = null;
+    global.ui.innerHTML = global.currentHoleText;
 }
 
 function translateCanvasContainer(magnitude, angle) {
@@ -212,6 +215,7 @@ function hitBallReleaseCallback() {
     resetButton.style.color = getTextColorForBackground(...hexToRgb(currentLevel.cssButtonColor));;
 
     global.canvasContainer.style.transform = null;
+    global.lastHitAngle = global.currentHitAngle;
 }
 
 function placeWallPointReleaseCallback() {
@@ -242,6 +246,8 @@ function moveCallback() {
         moveHandleCallback();
     } else if (global.inputMode === INPUT_MODES.moveWall) {
         moveWallCallback();
+    } else if (global.inputMode === INPUT_MODES.wall) {
+        if (wallPoint.vertices.length > 0) updateWallAngle(wallPoint);
     }
 }
 
@@ -263,6 +269,24 @@ function moveHandleCallback() {
             );
         }
     }
+
+    updateWallAngle(global.selectedWall);
+}
+
+function updateWallAngle(wall) {
+    if (wall.vertices.length === 1) {
+        const dx = joystick.currentPos.x - wall.vertices[0].x;
+        const dy = joystick.currentPos.y - wall.vertices[0].y;
+        const angle =  (Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360;;
+        global.ui.innerText = `${angle.toFixed(0)}°`;
+        if (angle === -0) global.ui.innerText = "0";
+    } else {
+        const dx = wall.vertices[1].x - wall.vertices[0].x;
+        const dy = wall.vertices[1].y - wall.vertices[0].y;
+        const angle =  (Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360;;
+        global.ui.innerText = `${angle.toFixed(0)}°`;
+        if (angle === -0) global.ui.innerText = "0";
+    }
 }
 
 function moveWallCallback() {
@@ -279,10 +303,11 @@ function moveWallCallback() {
         global.lastMoveLocation.x = joystick.currentPos.x;
         global.lastMoveLocation.y = joystick.currentPos.y;
     }
+
+    updateWallAngle(global.selectedWall);
 }
 
 function moveHitBallCallback() {
-    // TODO: I don't like this fix
     if (arrows.length === 0) return;
 
     let angleOffset = 1;
@@ -309,9 +334,15 @@ function moveHitBallCallback() {
     }
 
     const arrow = arrows[0];
-    const magnitude = calculateMagnitude(arrow.startPos.x, arrow.startPos.y, arrow.endPos.x, arrow.endPos.y);
-    const angle = Math.atan2(arrow.endPos.y - arrow.startPos.y, arrow.endPos.x - arrow.startPos.x);
-    global.currentUiText = `${(arrow.angle * 180 / Math.PI).toFixed(0)}° | ${magnitude.toFixed(0)}`;
+    global.currentHitAngle = `${(arrow.angle * 180 / Math.PI).toFixed(0)}° | ${arrow.magnitude.toFixed(0)}`;
+
+    let uiString = ""
+    if (global.lastHitAngle.length > 0) {
+        uiString = `<div class="prev-ui-text">${global.lastHitAngle}</div>`;
+    }
+    uiString += `<div>${global.currentHitAngle}</div>`;
+    global.ui.innerHTML = uiString;
+
     translateCanvasContainer(arrow.magnitude, arrow.angle);
 }
 
@@ -524,39 +555,20 @@ function draw() {
 
         if (global.inputMode === INPUT_MODES.wall && wall && wall.vertices.length > 0) {
 
-            if (wall.vertices.length === 1) {
-                const dx = joystick.currentPos.x - wall.vertices[0].x;
-                const dy = joystick.currentPos.y - wall.vertices[0].y;
-                const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-                global.ui.innerText = `${angle.toFixed(0)}°`;
-                if (angle === -0) global.ui.innerText = "0";
-            } else {
-                const dx = wall.vertices[1].x - wall.vertices[0].x;
-                const dy = wall.vertices[1].y - wall.vertices[0].y;
-                const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-                global.ui.innerText = `${angle.toFixed(0)}°`;
-                if (angle === -0) global.ui.innerText = "0";
-            }
-
-            global.ui.style.color = getTextColorForBackground(...hexToRgb(currentLevel.cssButtonColor));
-            global.ui.style.backgroundColor = currentLevel.cssButtonColor;
-        } else {
-            global.ui.style.backgroundColor = null;
+            // if (wall.vertices.length === 1) {
+            //     const dx = joystick.currentPos.x - wall.vertices[0].x;
+            //     const dy = joystick.currentPos.y - wall.vertices[0].y;
+            //     const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+            //     global.ui.innerText = `${angle.toFixed(0)}°`;
+            //     if (angle === -0) global.ui.innerText = "0";
+            // } else {
+            //     const dx = wall.vertices[1].x - wall.vertices[0].x;
+            //     const dy = wall.vertices[1].y - wall.vertices[0].y;
+            //     const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+            //     global.ui.innerText = `${angle.toFixed(0)}°`;
+            //     if (angle === -0) global.ui.innerText = "0";
+            // }
         }
-    }
-
-    if (global.inputMode === INPUT_MODES.hit) {
-        let uiString = ""
-        if (global.lastUiText.length > 0) {
-            uiString = `<div class="prev-ui-text">${global.lastUiText}</div>`;
-        }
-        uiString += `<div>${global.currentUiText}</div>`;
-        global.ui.innerHTML = uiString;
-        global.ui.style.color = getTextColorForBackground(...hexToRgb(currentLevel.cssButtonColor));
-        global.ui.style.backgroundColor = currentLevel.cssButtonColor;
-    } else if (global.lastUiText.length === 0) {
-        global.ui.style.backgroundColor = null;
-        global.ui.innerHTML = "";
     }
 }
 
@@ -756,12 +768,12 @@ function goToLevel(levelNum) {
     currentCircleRadius = MAX_CIRCLE_RADIUS;
     currentLevel.reset();
     location.hash = `#/${currentLevelIndex + 1}`;
+    global.lastHitAngle = "";
 
 
 
     globalReset();
-    global.lastUiText = "";
-    global.currentUiText = "";
+    currentLevelReset();;
 }
 
 function globalReset() {
@@ -918,7 +930,12 @@ window.addEventListener("mousemove", (e) => {
 });
 
 function currentLevelReset() {
-    global.lastUiText = global.currentUiText;
+    global.currentHitAngle = ""
+    // global.lastUiText = global.currentHitAngle;
+    global.currentHoleText = `${currentLevelIndex + 1} / ${levels.length}`;
+    global.ui.innerHTML = global.currentHoleText;
+    global.ui.style.color = getTextColorForBackground(...hexToRgb(currentLevel.cssButtonColor));
+    global.ui.style.backgroundColor = currentLevel.cssButtonColor;
     currentLevel.reset();
 }
 
@@ -1014,17 +1031,6 @@ function createShakeAnimation(angleInRadians) {
     }
   `;
 
-    // if (!big) {
-    //         keyframes = `
-    //     @keyframes ${keyframeName} {
-    //       0% { transform: translate(${xMultiplier * 8}px, ${yMultiplier * -8}px); }
-    //       100% { transform: translate(0, 0); }
-    //     }
-    //   `;
-    // }
-
-
-    // Insert new keyframes rule
     styleSheet.insertRule(keyframes, styleSheet.cssRules.length);
 
 
