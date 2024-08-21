@@ -229,10 +229,10 @@ class Level10 extends Level {
 }
 
 class Level11 extends Level {
-    backgroundColor = "#FFA9E7";
-    cssBackgroundColor = "#7F2CCB";
-    cssButtonColor = "#FF84E8";
-    cssButtonShadowColor = "#414361";
+    backgroundColor = "#93B5C6";
+    cssBackgroundColor = "#F0CF65";
+    cssButtonColor = "#D7816A";
+    cssButtonShadowColor = "#BD4F6C";
     constructor() {
         super();
         this.holes = [
@@ -253,10 +253,10 @@ class Level11 extends Level {
 }
 
 class Level12 extends Level {
-    backgroundColor = "#FFA9E7";
-    cssBackgroundColor = "#7F2CCB";
-    cssButtonColor = "#FF84E8";
-    cssButtonShadowColor = "#414361";
+    backgroundColor = "#524948";
+    cssBackgroundColor = "#7CB4B8";
+    cssButtonColor = "#70F8BA";
+    cssButtonShadowColor = "#57467B";
     constructor() {
         super();
         this.holes = [
@@ -284,10 +284,10 @@ class Level12 extends Level {
 }
 
 class Level13 extends Level {
-    backgroundColor = "#FFA9E7";
-    cssBackgroundColor = "#7F2CCB";
-    cssButtonColor = "#FF84E8";
-    cssButtonShadowColor = "#414361";
+    backgroundColor = "#6A8D73";
+    cssBackgroundColor = "#E4FFE1";
+    cssButtonColor = "#FFE8C2";
+    cssButtonShadowColor = "#F0A868";
     constructor() {
         super();
         this.holes = [
@@ -327,7 +327,6 @@ class Level13 extends Level {
         super.update();
         for (let i = 0; i < this.levelWalls.length; i++) {
             const wall = this.levelWalls[i];
-            const angle = wall.angle;
             wall.rotate(.01, 250, 250);
         }
     }

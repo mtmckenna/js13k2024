@@ -43,15 +43,21 @@ global.prevButton = document.getElementById("js-prev");
 global.nextButton = document.getElementById("js-next");
 document.getElementById("js-hit-ball").addEventListener("click", (e) => {
     e.preventDefault();
-    if (e.currentTarget.classList.contains("disabled")) return;
+    hitBallButtonClickCallback();
+});
+
+function hitBallButtonClickCallback() {
+    const el = document.getElementById("js-hit-ball");
+    if (el.classList.contains("disabled")) return;
     global.inputMode = INPUT_MODES.hit;
 
-    e.currentTarget.classList.add("active");
+    el.classList.add("active");
     document.getElementById("js-place-wall").classList.remove("active");
     document.getElementById("js-hit-ball").style.boxShadow = `0 2px ${currentLevel.cssButtonShadowColor}`;
     document.getElementById("js-place-wall").style.boxShadow = `0 5px ${currentLevel.cssButtonShadowColor}`;
 
-});
+}
+
 document.getElementById("js-place-wall").addEventListener("click", (e) => {
     e.preventDefault();
     if (e.currentTarget.classList.contains("disabled")) return;
@@ -104,12 +110,12 @@ const joystick = new Joystick(canvas, clickCallback, releaseCallback, moveCallba
 let wallPoint = new WallPoint();
 
 function clickCallback() {
-    global.title.style.opacity = 0;
+    // global.title.style.opacity = 0;
     global.lastMoveLocation.x = joystick.currentPos.x;
     global.lastMoveLocation.y = joystick.currentPos.y;
     global.ui.innerHTML = global.currentHoleText;
 
-    if (global.inputMode != INPUT_MODES.watching) {
+    if (global.inputMode !== INPUT_MODES.watching) {
         for (let i = 0; i < currentLevel.walls.length; i++) {
             const wall = currentLevel.walls[i];
             if (!wall.player) continue;
@@ -212,7 +218,7 @@ function hitBallReleaseCallback() {
 
     resetButton.style.backgroundColor = currentLevel.cssButtonColor;
     resetButton.style.boxShadow = `0 5px ${currentLevel.cssButtonShadowColor}`;
-    resetButton.style.color = getTextColorForBackground(...hexToRgb(currentLevel.cssButtonColor));;
+    resetButton.style.color = getTextColorForBackground(...hexToRgb(currentLevel.cssButtonColor));
 
     global.canvasContainer.style.transform = null;
     global.lastHitAngle = global.currentHitAngle;
@@ -277,13 +283,13 @@ function updateWallAngle(wall) {
     if (wall.vertices.length === 1) {
         const dx = joystick.currentPos.x - wall.vertices[0].x;
         const dy = joystick.currentPos.y - wall.vertices[0].y;
-        const angle =  (Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360;;
+        const angle =  (Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360;
         global.ui.innerText = `${angle.toFixed(0)}°`;
         if (angle === -0) global.ui.innerText = "0";
     } else {
         const dx = wall.vertices[1].x - wall.vertices[0].x;
         const dy = wall.vertices[1].y - wall.vertices[0].y;
-        const angle =  (Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360;;
+        const angle =  (Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360;
         global.ui.innerText = `${angle.toFixed(0)}°`;
         if (angle === -0) global.ui.innerText = "0";
     }
@@ -773,7 +779,7 @@ function goToLevel(levelNum) {
 
 
     globalReset();
-    currentLevelReset();;
+    currentLevelReset();
 }
 
 function globalReset() {
@@ -798,8 +804,8 @@ function globalReset() {
 
     Array.from(document.getElementsByClassName("button")).forEach(button => {
             let backgroundColor = currentLevel.cssButtonColor;
-            let shadowColor = `0 5px ${currentLevel.cssButtonShadowColor}`;;
-            let textColor = getTextColorForBackground(...hexToRgb(currentLevel.cssButtonColor));;
+            let shadowColor = `0 5px ${currentLevel.cssButtonShadowColor}`;
+            let textColor = getTextColorForBackground(...hexToRgb(currentLevel.cssButtonColor));
 
             if (!button.classList.contains("disabled")) {
                 button.style.backgroundColor = backgroundColor;
@@ -893,11 +899,16 @@ function getTextColorForBackground(r, g, b) {
 loop(0);
 document.addEventListener('DOMContentLoaded', () => {
     goToLevel(getLevelFromHash());
-    document.getElementById("js-hit-ball").click();
+    hitBallButtonClickCallback();
+    // document.getElementById("js-hit-ball").click();
 });
 
 window.addEventListener("hashchange", () => {
     goToLevel(getLevelFromHash());
+});
+
+document.body.addEventListener("click", () => {
+    global.title.style.opacity = 0;
 });
 
 window.addEventListener("mousemove", (e) => {
@@ -1026,7 +1037,7 @@ function createShakeAnimation(angleInRadians) {
       60% { transform: translate(${xMultiplier * 5}px, ${yMultiplier * -5}px); }
       70% { transform: translate(${xMultiplier * -3}px, ${yMultiplier * 3}px); }
       80% { transform: translate(${xMultiplier * 3}px, ${yMultiplier * -3}px); }
-      90% { transform: translate(${xMultiplier * -1}px, ${yMultiplier * 1}px); }
+      90% { transform: translate(${xMultiplier * -1}px, ${yMultiplier}px); }
       100% { transform: translate(0, 0); }
     }
   `;
