@@ -6,12 +6,12 @@ export class Level {
     balls = [];
     walls = [];
     holes = [];
+    number=0;
     transitioningAway = false;
     backgroundColor = "red";
     cssBackgroundColor = "red";
     cssButtonColor = "red";
     cssButtonShadowColor = "red";
-    textColor = "#ffffff";
     width = 500;
     height = 500;
     hit = false;
@@ -31,6 +31,17 @@ export class Level {
         document.getElementById("js-place-wall").setAttribute('disabled', false);
 
         document.body.style.backgroundColor = this.cssBackgroundColor;
+
+        const wallEl = document.getElementById("js-place-wall");
+        wallEl.style.display = "block";
+        // remove jiggle class from wallEl
+        wallEl.classList.remove('jiggle');
+
+        if (this.number < 5) {
+            wallEl.style.display = "none";
+        } else if(this.number === 5) {
+            wallEl.classList.add('jiggle');
+        }
     }
 
     get solved() {
@@ -52,6 +63,7 @@ class Level01 extends Level {
     cssBackgroundColor = "#59A96A";
     cssButtonColor = "#9BDEAC";
     cssButtonShadowColor = "#474A2C";
+    number = 1;
 
     constructor() {
         super();
@@ -66,6 +78,7 @@ class Level02 extends Level {
     cssBackgroundColor = "#977390";
     cssButtonColor = "#AC7B7D";
     cssButtonShadowColor = "#785589";
+    number= 2;
 
     constructor() {
         super();
@@ -79,6 +92,7 @@ class Level03 extends Level {
     cssBackgroundColor = "#586F7C";
     cssButtonColor = "#B8DBD9";
     cssButtonShadowColor = "#2F4550";
+    number= 3;
 
     constructor() {
         super();
@@ -93,6 +107,7 @@ class Level04 extends Level {
     cssBackgroundColor = "#7A93AC";
     cssButtonColor = "#92BCEA";
     cssButtonShadowColor = "#617073";
+    number= 4;
 
     constructor() {
         super();
@@ -107,6 +122,7 @@ class Level05 extends Level {
     cssBackgroundColor = "#84732B";
     cssButtonColor = "#EC4E20";
     cssButtonShadowColor = "#574F2A";
+    number=5;
 
     constructor() {
         super();
@@ -124,6 +140,8 @@ class Level06 extends Level {
     cssBackgroundColor = "#D9D2B6";
     cssButtonColor = "#D0E1D4";
     cssButtonShadowColor = "#71697A";
+    number= 6;
+
     constructor() {
         super();
         this.holes = [new Hole(250, 150), new Hole(100, 350), new Hole(400, 350)];
@@ -157,6 +175,7 @@ class Level07 extends Level {
     cssBackgroundColor = "#CE6A85";
     cssButtonColor = "#FF8C61";
     cssButtonShadowColor = "#985277";
+    number=7;
 
     constructor() {
         super();
@@ -171,6 +190,7 @@ class Level08 extends Level {
     cssBackgroundColor = "#828C51";
     cssButtonColor = "#A6C36F";
     cssButtonShadowColor = "#335145";
+    number= 8;
 
     constructor() {
         super();
@@ -188,6 +208,7 @@ class Level09 extends Level {
     cssBackgroundColor = "#A96DA3";
     cssButtonColor = "#BC7C9C";
     cssButtonShadowColor = "#3B3B58";
+    number= 9;
 
     constructor() {
         super();
@@ -211,6 +232,8 @@ class Level10 extends Level {
     cssBackgroundColor = "#7F2CCB";
     cssButtonColor = "#FF84E8";
     cssButtonShadowColor = "#414361";
+    number= 10;
+
     constructor() {
         super();
         this.holes = [
@@ -233,6 +256,8 @@ class Level11 extends Level {
     cssBackgroundColor = "#F0CF65";
     cssButtonColor = "#D7816A";
     cssButtonShadowColor = "#BD4F6C";
+    number = 11;
+
     constructor() {
         super();
         this.holes = [
@@ -257,6 +282,8 @@ class Level12 extends Level {
     cssBackgroundColor = "#7CB4B8";
     cssButtonColor = "#70F8BA";
     cssButtonShadowColor = "#57467B";
+    number = 12;
+
     constructor() {
         super();
         this.holes = [
@@ -288,6 +315,8 @@ class Level13 extends Level {
     cssBackgroundColor = "#E4FFE1";
     cssButtonColor = "#FFE8C2";
     cssButtonShadowColor = "#F0A868";
+    number = 13;
+
     constructor() {
         super();
         this.holes = [
