@@ -42,6 +42,9 @@ export class Level {
 
         return true;
     }
+
+    update() {
+    }
 }
 
 class Level01 extends Level {
@@ -280,6 +283,57 @@ class Level12 extends Level {
     }
 }
 
+class Level13 extends Level {
+    backgroundColor = "#FFA9E7";
+    cssBackgroundColor = "#7F2CCB";
+    cssButtonColor = "#FF84E8";
+    cssButtonShadowColor = "#414361";
+    constructor() {
+        super();
+        this.holes = [
+            new Hole(250, 250),
+        ];
+        this.balls = [
+            new Ball(250, 100, Math.PI),
+        ];
+
+        let leftWallX1 = 175;
+        let leftWallY1 = 150;
+        let leftWallX2 = 175;
+        let leftWallY2 = 350;
+        let rightWallX1 = 325;
+        let rightWallY1 = 150;
+        let rightWallX2 = 325;
+        let rightWallY2 = 350;
+        let topWallX1 = 185;
+        let topWallY1 = 160;
+        let topWallX2 = 315;
+        let topWallY2 = 160;
+        let bottomWallX1 = 185;
+        let bottomWallY1 = 340;
+        let bottomWallX2 = 315;
+        let bottomWallY2 = 340;
+
+        const w1= new Wall(leftWallX1, leftWallY1, leftWallX2, leftWallY2, false);
+        const w2= new Wall(rightWallX1, rightWallY1, rightWallX2, rightWallY2, false);
+        const w3= new Wall(topWallX1, topWallY1, topWallX2, topWallY2, false);
+        const w4 = new Wall(bottomWallX1, bottomWallY1, bottomWallX2, bottomWallY2, false);
+
+        this.walls = [w1, w2, w3, w4];
+        this.levelWalls = [w1, w2, w3, w4];
+    }
+
+    update() {
+        super.update();
+        for (let i = 0; i < this.levelWalls.length; i++) {
+            const wall = this.levelWalls[i];
+            const angle = wall.angle;
+            wall.rotate(.01, 250, 250);
+        }
+    }
+
+}
+
 export const generateLevels = () => [
     new Level01(),
     new Level02(),
@@ -293,4 +347,6 @@ export const generateLevels = () => [
     new Level10(),
     new Level11(),
     new Level12(),
+    new Level13()
 ];
+

@@ -18,13 +18,13 @@ export default class Wall {
         this.handle2 = {x: 0, y: 0};
         this.broken = false;
         this.player = player;
-        this.wall = wall;
         if (player) {
             this.color = PLAYER_WALL_COLOR;
         } else {
             this.color = LEVEL_WALL_COLOR;
         }
         this.setVertices(x1, y1, x2, y2);
+        this.emitter = new WallParticles(this.v1, this.v2, this.color);
     }
 
     setVertices(x1, y1, x2, y2) {
@@ -32,6 +32,7 @@ export default class Wall {
         this.v1.y = y1;
         this.v2.x = x2;
         this.v2.y = y2;
+
         const {v1, v2} = this;
         this.pos.x = (v1.x + v2.x) / 2;
         this.pos.y = (v1.y + v2.y) / 2;
@@ -44,7 +45,6 @@ export default class Wall {
         this.handle1.y = this.v1.y - offsetY;
         this.handle2.x = this.v2.x + offsetX;
         this.handle2.y = this.v2.y + offsetY;
-        this.setParticles();
     }
 
     update() {
@@ -52,9 +52,22 @@ export default class Wall {
         this.emitter.update();
     }
 
-    setParticles() {
-        this.emitter = new WallParticles(this.v1, this.v2, this.color);
+    rotate(angle, cx, cy) {
+        const x1 = this.v1.x;
+        const y1 = this.v1.y;
+        const x2 = this.v2.x;
+        const y2 = this.v2.y;
+        const cos = Math.cos(angle);
+        const sin = Math.sin(angle);
+        const x1r = cos * (x1 - cx) - sin * (y1 - cy) + cx;
+        const y1r = sin * (x1 - cx) + cos * (y1 - cy) + cy;
+        const x2r = cos * (x2 - cx) - sin * (y2 - cy) + cx;
+        const y2r = sin * (x2 - cx) + cos * (y2 - cy) + cy;
+        this.setVertices(x1r, y1r, x2r, y2r);
+    }
 
+    setParticles() {
+        // this.emitter = new WallParticles(this.v1, this.v2, this.color);
     }
 
     reset() {
@@ -64,6 +77,7 @@ export default class Wall {
 
     collided(speed) {
         this.broken = true;
+        this.emitter = new WallParticles(this.v1, this.v2, this.color);
         this.emitter.particles.forEach(particle => {
             const angle = Math.random() * Math.PI * 2;
             particle.vel.x = speed * (Math.random() * 2 - 1) * Math.cos(angle);

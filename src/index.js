@@ -655,6 +655,8 @@ function drawSingleArrow(ctx, fromx, fromy, tox, toy) {
 }
 
 function update(timestep) {
+    currentLevel.update();
+
     for (let i = 0; i < currentLevel.balls.length; i++) {
         const ball = currentLevel.balls[i];
         const arrow = arrows[i];
