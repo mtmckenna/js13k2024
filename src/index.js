@@ -854,6 +854,10 @@ document.body.addEventListener("click", () => {
     global.title.style.opacity = 0;
 });
 
+document.body.addEventListener("touchstart", () => {
+    global.title.style.opacity = 0;
+});
+
 window.addEventListener("mousemove", (e) => {
     const rect = canvas.getBoundingClientRect();
 
