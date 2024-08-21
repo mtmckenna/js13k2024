@@ -40,6 +40,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        /*transition: transform 1s ease-in-out;*/
       }
 
       #canvas {
@@ -233,6 +234,18 @@
 
       .shake {
         animation: shake-animation 1s ease-out forwards;
+      }
+
+      .offscreen-right {
+        transform: translateX(100vw); /* Move off-screen to the right */
+      }
+
+      .offscreen-left {
+        transform: translateX(-100vw); /* Move off-screen to the left */
+      }
+
+      .onscreen {
+        transform: translateX(0); /* Bring back to the original position */
       }
 
       @keyframes shake-animation {}

@@ -33,7 +33,8 @@ let global = {
     currentHitAngle: "",
     lastHitAngle: "",
     currentHoleText:"",
-    lastMoveLocation: {x: 0, y: 0}
+    lastMoveLocation: {x: 0, y: 0},
+    transitioning: false
 };
 global.ui = document.getElementById("game-ui");
 global.title = document.getElementById("title-container");
@@ -103,14 +104,13 @@ let nextLevel = levels[nextLevelIndex];
 
 const arrows = [];
 const MAX_CIRCLE_RADIUS = Math.hypot(canvas.width, canvas.height) / 2;
-let currentCircleRadius = MAX_CIRCLE_RADIUS;
-const CIRCLE_SHRINK_RATE = 5;
+// let currentCircleRadius = MAX_CIRCLE_RADIUS;
+// const CIRCLE_SHRINK_RATE = 5;
 const joystick = new Joystick(canvas, clickCallback, releaseCallback, moveCallback);
 
 let wallPoint = new WallPoint();
 
 function clickCallback() {
-    // global.title.style.opacity = 0;
     global.lastMoveLocation.x = joystick.currentPos.x;
     global.lastMoveLocation.y = joystick.currentPos.y;
     global.ui.innerHTML = global.currentHoleText;
@@ -493,8 +493,6 @@ function drawHole(hole) {
 function drawLevel(level) {
     global.canvasContainer.style.backgroundColor = level.backgroundColor;
     global.holeNumber.style.color = level.cssBackgroundColor;
-    global.holeNumber.innerText = `${currentLevelIndex + 1}`;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < level.holes.length; i++) {
         const hole = level.holes[i];
         drawHole(hole);
@@ -518,63 +516,17 @@ function drawLevel(level) {
     }
 }
 
-function drawCircleStencil() {
-    ctx.beginPath();
-    ctx.arc(canvas.width / 2, canvas.height / 2, currentCircleRadius, 0, Math.PI * 2);
-    ctx.closePath();
-    ctx.clip();
-}
-
 
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    if (currentLevel.solved) {
-        drawLevel(nextLevel);
-        ctx.save();
-        drawCircleStencil();
-    }
-
     drawLevel(currentLevel);
-
-    if (currentLevel.solved) {
-        ctx.restore();
-    }
 
     for (let i = 0; i < arrows.length; i++) {
         const arrow = arrows[i];
         const ball = currentLevel.balls[i];
         if (ball.hole) continue;
         drawArrow(arrow);
-    }
-
-
-    ctx.fillStyle = "white";
-
-    if (global.inputMode & INPUT_MODES.moving) {
-        let wall;
-        if (global.inputMode & INPUT_MODES.moveHandle) {
-            wall = global.selectedWall;
-        } else if (global.inputMode & INPUT_MODES.placeAny) {
-            wall = wallPoint;
-        }
-
-        if (global.inputMode === INPUT_MODES.wall && wall && wall.vertices.length > 0) {
-
-            // if (wall.vertices.length === 1) {
-            //     const dx = joystick.currentPos.x - wall.vertices[0].x;
-            //     const dy = joystick.currentPos.y - wall.vertices[0].y;
-            //     const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-            //     global.ui.innerText = `${angle.toFixed(0)}°`;
-            //     if (angle === -0) global.ui.innerText = "0";
-            // } else {
-            //     const dx = wall.vertices[1].x - wall.vertices[0].x;
-            //     const dy = wall.vertices[1].y - wall.vertices[0].y;
-            //     const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-            //     global.ui.innerText = `${angle.toFixed(0)}°`;
-            //     if (angle === -0) global.ui.innerText = "0";
-            // }
-        }
     }
 }
 
@@ -681,8 +633,6 @@ function update(timestep) {
 
         ball.update(timestep);
 
-        // if (!ball.falling && !currentLevel.solved) ball.alpha = 1.0;
-
         for (let j = 0; j < currentLevel.balls.length; j++) {
             if (i === j) continue;
             const otherBall = currentLevel.balls[j];
@@ -705,14 +655,8 @@ function update(timestep) {
     }
 
 
-    if (currentLevel.solved) {
-        // currentLevel.transitioningAway = true; // TODO: maybe we don't need transitioningAway?
-
-        currentCircleRadius -= CIRCLE_SHRINK_RATE;
-
-        if (currentCircleRadius <= 0) {
-            goToLevel(currentLevelIndex + 2); // +2 because it's 0-indexed
-        }
+    if (currentLevel.solved && !global.transitioning) {
+        transitionCanvas();
     }
 
     if (currentLevel.hit) {
@@ -771,11 +715,10 @@ function goToLevel(levelNum) {
     const nextLevelIndex = (currentLevelIndex + 1) % levels.length;
     currentLevel = levels[currentLevelIndex];
     nextLevel = levels[nextLevelIndex]
-    currentCircleRadius = MAX_CIRCLE_RADIUS;
     currentLevel.reset();
     location.hash = `#/${currentLevelIndex + 1}`;
     global.lastHitAngle = "";
-
+    global.holeNumber.innerText = `${currentLevelIndex + 1}`;
 
 
     globalReset();
@@ -1082,4 +1025,46 @@ function triggerShake(angleInRadians) {
     setTimeout(() => {
         document.getElementById("canvas-container").classList.remove('shake');
     }, 1000);
+}
+
+
+function fadeText(newText) {
+    const element = global.holeNumber;
+
+    element.classList.add('fade-out');
+
+    setTimeout(() => {
+        element.textContent = newText;
+
+        element.classList.remove('fade-out');
+        element.classList.add('fade-in');
+    }, 1000); // Match the duration of the transition in the CSS (1 second in this case)
+}
+
+
+function transitionCanvas() {
+    const c = global.canvasContainer;
+    global.transitioning = true;
+    c.classList.add('offscreen-right');
+    c.style.transition = 'transform 1s ease-in-out';
+
+    setTimeout(() => {
+        goToLevel(currentLevelIndex + 2); // +2 because it's 0-indexed
+
+        c.classList.remove('offscreen-right');
+        c.classList.add('offscreen-left');
+        c.style.transition = 'none';
+
+
+        setTimeout(() => {
+            c.style.transition = 'transform 1s ease-in-out';
+            c.classList.remove('offscreen-left');
+            c.classList.add('onscreen');
+            setTimeout(() => {
+                c.style.transition = 'none';
+                global.transitioning = false;
+                c.classList.remove('onscreen');
+            }, 1000);
+        }, 50); // A slight delay to ensure the left-to-right transition is visible
+    }, 1000); // Match the duration of the transition (1 second)
 }
