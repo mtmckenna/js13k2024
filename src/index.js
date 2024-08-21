@@ -493,6 +493,8 @@ function drawHole(hole) {
 function drawLevel(level) {
     global.canvasContainer.style.backgroundColor = level.backgroundColor;
     global.holeNumber.style.color = level.cssBackgroundColor;
+
+    level.draw(ctx);
     for (let i = 0; i < level.holes.length; i++) {
         const hole = level.holes[i];
         drawHole(hole);

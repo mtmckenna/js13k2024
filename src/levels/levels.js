@@ -56,6 +56,9 @@ export class Level {
 
     update() {
     }
+
+    draw(ctx) {
+    }
 }
 
 class Level01 extends Level {
@@ -132,6 +135,16 @@ class Level05 extends Level {
             new Wall(25, 0, 25, 500, false),
             new Wall(475, 0, 475, 500, false)
         ];
+    }
+
+    draw(ctx) {
+        // draw dashed rectangle to the left of the first hole
+        ctx.beginPath();
+        ctx.setLineDash([5, 15]);
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 2;
+        ctx.rect(100, 75, 20, 100);
+        ctx.stroke();
     }
 }
 
