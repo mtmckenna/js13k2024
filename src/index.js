@@ -16,9 +16,6 @@ const ctx = canvas.getContext("2d");
 
 
 
-
-
-
 const INPUT_MODES = {
     hit: 1 << 0,        // 00001
     wall: 1 << 1,       // 00010
@@ -222,6 +219,7 @@ function hitBallReleaseCallback() {
         const y = Math.sin(arrow.angle) * arrow.magnitude * .05;
         ball.vel.x = x;
         ball.vel.y = y;
+        ball.hit = true;
     }
 
     // triggerShake(arrows[0].angle, false, arrows[0].magnitude);
@@ -475,28 +473,28 @@ function calculateMagnitude(x1, y1, x2, y2) {
     return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 }
 
-function drawBall(ball) {
+function drawBall(ball, stroke = true) {
     // draw on both sides if the ball is on the edge of the screen
     if ((ball.pos.x - ball.radius < 0)) {
-        drawSingleBall(ball, ball.pos.x + canvas.width, ball.pos.y);
+        drawSingleBall(ball, ball.pos.x + canvas.width, ball.pos.y, stroke);
     }
 
     if ((ball.pos.x + ball.radius > canvas.width)) {
-        drawSingleBall(ball, ball.pos.x - canvas.width, ball.pos.y);
+        drawSingleBall(ball, ball.pos.x - canvas.width, ball.pos.y, stroke);
     }
 
     if ((ball.pos.y - ball.radius < 0)) {
-        drawSingleBall(ball, ball.pos.x, ball.pos.y + canvas.height);
+        drawSingleBall(ball, ball.pos.x, ball.pos.y + canvas.height, stroke);
     }
 
     if ((ball.pos.y + ball.radius > canvas.height)) {
-        drawSingleBall(ball, ball.pos.x, ball.pos.y - canvas.height);
+        drawSingleBall(ball, ball.pos.x, ball.pos.y - canvas.height, stroke);
     }
 
-    drawSingleBall(ball, ball.pos.x, ball.pos.y);
+    drawSingleBall(ball, ball.pos.x, ball.pos.y, stroke);
 }
 
-function drawSingleBall(ball, x, y) {
+function drawSingleBall(ball, x, y, stroke = true) {
     ctx.beginPath();
     ctx.arc(x, y, ball.radius, 0, Math.PI * 2);
     ctx.fillStyle = `rgba(255, 255, 255, ${ball.alpha})`;
@@ -505,7 +503,7 @@ function drawSingleBall(ball, x, y) {
     ctx.setLineDash([]);
     ctx.closePath();
 
-    ctx.stroke();
+    if (stroke) ctx.stroke();
     ctx.fill();
 
 }
@@ -542,6 +540,14 @@ function drawLevel(level) {
 
     for (let i = 0; i < level.balls.length; i++) {
         const ball = level.balls[i];
+
+        if (ball.hit) {
+            for (let j = 0; j < ball.lastPositions.length; j++) {
+                const lastBall = ball.lastPositions[j];
+                drawBall(lastBall, false);
+            }
+        }
+
         drawBall(ball);
     }
 }

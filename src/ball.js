@@ -1,8 +1,9 @@
 export default class Ball {
 
   mass = 1;
+  numLastPositions = 50;
   
-  constructor(x, y, startAngle = Math.PI, radius = 8) {
+  constructor(x, y, startAngle = Math.PI, radius = 8, realBall = true) {
     this.radius = radius;
     this.color = "#fff";
     this.pos = { x, y };
@@ -15,6 +16,18 @@ export default class Ball {
     this.pos.y = y;
     this.alpha = 1.0;
     this.friction = 0;
+    this.lastPositions = [];
+    this.tick = 0;
+    this.lastPosIndex = 0;
+    this.hit = false;
+
+    if (realBall) {
+      for (let i = 0; i < this.numLastPositions; i++) {
+        const ball = new Ball(x, y, startAngle, radius, false);
+        ball.alpha = 0.0;
+        this.lastPositions.push(ball);
+      }
+    }
   }
 
   project(axis) {
@@ -26,6 +39,7 @@ export default class Ball {
   }
 
   update() {
+    this.tick++;
     // const BASE_FRICTION = 0.98;
     const MIN_VEL = 0.01;
     const currentFriction = .98 - this.friction;
@@ -41,6 +55,19 @@ export default class Ball {
     // Scale the movement step by the timeFactor
     this.pos.x += this.vel.x;
     this.pos.y += this.vel.y;
+
+    if (this.tick % 1 === 0) {
+      const ball = this.lastPositions[this.lastPosIndex];
+        ball.pos.x = this.pos.x;
+        ball.pos.y = this.pos.y;
+        ball.alpha = 0.25;
+      this.lastPosIndex = (this.lastPosIndex + 1) % this.numLastPositions;
+    }
+
+    for (let i = 0; i < this.numLastPositions; i++) {
+      const ball = this.lastPositions[i];
+      ball.alpha -= 0.009;
+    }
   }
 
 
@@ -50,7 +77,13 @@ export default class Ball {
     this.hole = null;
     this.vel.x = 0;
     this.vel.y = 0;
-    this.falling = false;
     this.alpha = 1.0;
+    this.tick = 0;
+    this.hit = false;
+
+    for (let i = 0; i < this.numLastPositions; i++) {
+      this.lastPositions[i] = new Ball(this.originalPos.x, this.originalPos.y, this.startAngle, this.radius);
+      this.lastPositions[i].alpha = 0.0;
+    }
   }
 }
