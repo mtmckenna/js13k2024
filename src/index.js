@@ -4,7 +4,7 @@ import Arrow from "./arrow.js";
 import WallPoint from "./wall_point.js";
 import {calculateSeparation} from "./collision.js";
 import {generateLevels} from "./levels/levels.js";
-import playerSmall from "./player-small.js";
+import playerSmall from "./vendor/player-small.js";
 import { hitSong } from "./songs.js";
 
 const BALL_MADE_THRESHOLD = 0.25;
