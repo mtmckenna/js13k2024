@@ -4,6 +4,8 @@ import Arrow from "./arrow.js";
 import WallPoint from "./wall_point.js";
 import {calculateSeparation} from "./collision.js";
 import {generateLevels} from "./levels/levels.js";
+import playerSmall from "./player-small.js";
+import { hitSong } from "./songs.js";
 
 const BALL_MADE_THRESHOLD = 0.25;
 const BALL_STOPPED_THRESHOLD = 0.15
@@ -11,6 +13,11 @@ const MIN_WALL_LENGTH = 2;
 
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
+
+
+
+
+
 
 const INPUT_MODES = {
     hit: 1 << 0,        // 00001
@@ -45,6 +52,26 @@ global.nextButton = document.getElementById("js-next");
 document.getElementById("js-hit-ball").addEventListener("click", (e) => {
     e.preventDefault();
     hitBallButtonClickCallback();
+
+    var player = new playerSmall();
+    player.init(hitSong);
+
+    // Generate music...
+    var done = false;
+
+    setInterval(function () {
+        if (done) return;
+        done = player.generate() >= 1;
+        if (done) {
+            var wave = player.createWave();
+            var audio = document.createElement("audio");
+            audio.src = URL.createObjectURL(
+                new Blob([wave], { type: "audio/wav" })
+            );
+            // audio.play();
+        }
+    }, 0);
+
 });
 
 function hitBallButtonClickCallback() {
@@ -53,6 +80,7 @@ function hitBallButtonClickCallback() {
     global.inputMode = INPUT_MODES.hit;
 
     el.classList.add("active");
+
     document.getElementById("js-place-wall").classList.remove("active");
     document.getElementById("js-hit-ball").style.boxShadow = `0 2px ${currentLevel.cssButtonShadowColor}`;
     document.getElementById("js-place-wall").style.boxShadow = `0 5px ${currentLevel.cssButtonShadowColor}`;
