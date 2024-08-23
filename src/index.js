@@ -49,7 +49,6 @@ let global = {
     }
 };
 global.ui = document.getElementById("game-ui");
-global.title = document.getElementById("title-container");
 global.holeNumber = document.getElementById("hole-number");
 global.canvasContainer = document.getElementById("canvas-container");
 global.prevButton = document.getElementById("js-prev");
@@ -119,7 +118,11 @@ document.getElementById("js-reset").addEventListener("click", (e) => {
 global.prevButton.addEventListener("click", (e) => {
     e.preventDefault();
     if (e.currentTarget.classList.contains("disabled")) return;
-    goToLevel(currentLevelIndex);
+    if (currentLevelIndex === -1) {
+        goToLevel(levels.length)
+    } else {
+        goToLevel(currentLevelIndex);
+    }
 });
 
 global.nextButton.addEventListener("click", (e) => {
@@ -568,9 +571,21 @@ function drawLevel(level) {
     }
 }
 
+function win() {
+    global.currentHoleText = "";
+    global.holeNumber.innerText = "";
+    playSong("winGame");
+    location.hash = `#/win`;
+    currentLevelIndex = -1;
+}
+
 
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (currentLevelIndex === -1) {
+        return;
+    }
 
     drawLevel(currentLevel);
 
@@ -707,7 +722,7 @@ function update(timestep) {
     }
 
 
-    if (currentLevel.solved && !global.transitioning) {
+    if (currentLevel.solved && !global.transitioning && currentLevelIndex !== -1) {
         playSong("winLevel");
         transitionCanvas();
     }
@@ -766,6 +781,32 @@ function checkWallCollision(ball) {
 }
 
 function goToLevel(levelNum) {
+
+    if (levelNum ==="win") {
+        document.getElementById("title").classList.add("hide");
+        document.getElementById("win").classList.remove("hide");
+        document.getElementById("win").childNodes.forEach(child => {
+            if (child.tagName === "SPAN") {
+                child.classList.remove("letter");
+                child.classList.add("letter");
+            }
+        });
+        win();
+        globalReset();
+        return;
+    } else if (levelNum === 1) {
+        document.getElementById("win").classList.add("hide");
+        document.getElementById("title").classList.remove("hide");
+        document.getElementById("title").childNodes.forEach(child => {
+            if (child.tagName === "SPAN") {
+                child.classList.remove("letter");
+                child.classList.add("letter");
+            }
+        });
+    } else {
+        document.getElementById("win").classList.add("hide");
+    }
+
     currentLevelIndex = (levelNum - 1) % levels.length;
     const nextLevelIndex = (currentLevelIndex + 1) % levels.length;
     currentLevel = levels[currentLevelIndex];
@@ -774,8 +815,6 @@ function goToLevel(levelNum) {
     location.hash = `#/${currentLevelIndex + 1}`;
     global.lastHitAngle = "";
     global.holeNumber.innerText = `${currentLevelIndex + 1}`;
-
-
 
     globalReset();
     currentLevelReset();
@@ -797,7 +836,7 @@ function globalReset() {
         global.prevButton.classList.add("disabled");
     }
 
-    if (currentLevelIndex === levels.length - 1) {
+    if (currentLevelIndex === levels.length - 1 || currentLevelIndex === -1) {
         global.nextButton.classList.add("disabled");
     }
 
@@ -873,6 +912,7 @@ function loop(timestamp) {
 
 function getLevelFromHash() {
     const hash = window.location.hash.substring(2)
+    if (hash === "win") return "win";
     if (hash.length === 0) return 1;
     return parseInt(hash, 10);
 }
@@ -907,25 +947,29 @@ function playSong(name) {
 
 loop(0);
 document.addEventListener('DOMContentLoaded', () => {
-    goToLevel(getLevelFromHash());
+    const hash = getLevelFromHash();
+        goToLevel(hash);
+
     hitBallButtonClickCallback();
     generateSong(hitSong, "hit");
     generateSong(winLevelSong, "winLevel");
     generateSong(wallSong, "wall");
     generateSong(loseLevelSong, "loseLevel");
-    // document.getElementById("js-hit-ball").click();
+    generateSong(winGameSong, "winGame");
 });
 
 window.addEventListener("hashchange", () => {
-    goToLevel(getLevelFromHash());
+    const val = getLevelFromHash()
+    if (val !== "win") goToLevel(getLevelFromHash());
 });
 
 document.body.addEventListener("click", () => {
-    global.title.style.opacity = 0;
+    document.getElementById("title").classList.add("hide");
 });
 
 document.body.addEventListener("touchstart", () => {
-    global.title.style.opacity = 0;
+    document.getElementById("title").classList.add("hide");
+
 });
 
 window.addEventListener("mousemove", (e) => {
@@ -1101,34 +1145,19 @@ function triggerShake(angleInRadians) {
     }, 1000);
 }
 
-
-function fadeText(newText) {
-    const element = global.holeNumber;
-
-    element.classList.add('fade-out');
-
-    setTimeout(() => {
-        element.textContent = newText;
-
-        element.classList.remove('fade-out');
-        element.classList.add('fade-in');
-    }, 1000); // Match the duration of the transition in the CSS (1 second in this case)
-}
-
-
 function transitionCanvas() {
     const c = global.canvasContainer;
     global.transitioning = true;
     c.classList.add('offscreen-right');
     c.style.transition = 'transform 1s ease-in-out';
+    const curr = currentLevelIndex;
 
     setTimeout(() => {
-        goToLevel(currentLevelIndex + 2); // +2 because it's 0-indexed
-
+        const levelNum = curr + 2 > levels.length ? "win" : curr + 2;
+        goToLevel(levelNum); // +2 because it's 0-indexed
         c.classList.remove('offscreen-right');
         c.classList.add('offscreen-left');
         c.style.transition = 'none';
-
 
         setTimeout(() => {
             c.style.transition = 'transform 1s ease-in-out';

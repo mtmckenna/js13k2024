@@ -160,15 +160,15 @@
       }
 
       #title-container {
-        position: absolute;
-        display: flex;
-        justify-content: start;
-        align-items: flex-start;
-        color: white;
-        -webkit-text-stroke: 2px black;
-        top: 40px;
-        transition: opacity 1s ease-in-out;
-        z-index: 2;
+        /*position: absolute;*/
+        /*display: flex;*/
+        /*justify-content: start;*/
+        /*align-items: flex-start;*/
+        /*color: white;*/
+        /*-webkit-text-stroke: 2px black;*/
+        /*top: 40px;*/
+        /*transition: opacity 1s ease-in-out;*/
+        /*z-index: 2;*/
       }
 
       .letter {
@@ -251,6 +251,34 @@
         animation: jiggle-animation 0.5s infinite;
       }
 
+      .hide {
+        opacity: 0;
+      }
+
+      #title {
+        position: absolute;
+        display: flex;
+        justify-content: start;
+        align-items: flex-start;
+        color: white;
+        -webkit-text-stroke: 2px black;
+        top: 40px;
+        transition: opacity 1s ease-in-out;
+        z-index: 2;
+      }
+
+      #win {
+        position: absolute;
+        display: flex;
+        justify-content: start;
+        align-items: flex-start;
+        color: white;
+        -webkit-text-stroke: 2px black;
+        /*top: 40px;*/
+        transition: opacity 1s ease-in-out;
+        z-index: 2;
+      }
+
       @keyframes jiggle-animation {
         0% { transform: rotate(0deg); }
         25% { transform: rotate(5deg); }
@@ -270,17 +298,29 @@
       <div id="hole-number"></div>
 
     </div>
-    <div id="title-container">
-      <span class="letter">E</span>
-      <span class="letter">n</span>
-      <span class="letter">t</span>
-      <span class="letter">a</span>
-      <span class="letter">n</span>
-      <span class="letter">g</span>
-      <span class="letter">o</span>
-      <span class="letter">l</span>
-      <span class="letter">f</span>
-    </div>
+      <div id="title">
+        <span class="letter">E</span>
+        <span class="letter">n</span>
+        <span class="letter">t</span>
+        <span class="letter">a</span>
+        <span class="letter">n</span>
+        <span class="letter">g</span>
+        <span class="letter">o</span>
+        <span class="letter">l</span>
+        <span class="letter">f</span>
+      </div>
+
+      <div id="win" class="hide">
+        <span>G</span>
+        <span>o</span>
+        <span>o</span>
+        <span>d</span>
+        <span>&nbsp;</span>
+        <span>J</span>
+        <span>o</span>
+        <span>b</span>
+        <span>!</span>
+      </div>
     <div id="top-container">
       <div class="button" id="js-prev"><span class="button-label">Previous</span></div>
       <div id="game-ui"></div>
@@ -293,6 +333,5 @@
     </div>
   </div>
   <script type="module" src="src/index.js"></script>
-
   </body>
 </html>
