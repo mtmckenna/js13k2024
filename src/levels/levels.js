@@ -365,10 +365,10 @@ class Level13 extends Level {
         const w3= new Wall(topWallX1, topWallY1, topWallX2, topWallY2, false);
         const w4 = new Wall(bottomWallX1, bottomWallY1, bottomWallX2, bottomWallY2, false);
 
-        this.walls = [];
-        this.levelWalls = [];
-        // this.walls = [w1, w2, w3, w4];
-        // this.levelWalls = [w1, w2, w3, w4];
+        // this.walls = [];
+        // this.levelWalls = [];
+        this.walls = [w1, w2, w3, w4];
+        this.levelWalls = [w1, w2, w3, w4];
     }
 
     update() {
