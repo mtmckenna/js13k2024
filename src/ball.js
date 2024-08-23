@@ -6,6 +6,7 @@ export default class Ball {
   constructor(x, y, startAngle = Math.PI, radius = 8, realBall = true) {
     this.radius = radius;
     this.color = "#fff";
+    this.trailColor = "#fff";
     this.pos = { x, y };
     this.originalPos = { x, y };
     this.vel = { x: 0, y: 0 };
@@ -25,6 +26,7 @@ export default class Ball {
       for (let i = 0; i < this.numLastPositions; i++) {
         const ball = new Ball(x, y, startAngle, radius, false);
         ball.alpha = 0.0;
+        ball.trailColor = this.trailColor;
         this.lastPositions.push(ball);
       }
     }

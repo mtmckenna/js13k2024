@@ -512,6 +512,9 @@ function drawSingleBall(ball, x, y, stroke = true) {
     ctx.beginPath();
     ctx.arc(x, y, ball.radius, 0, Math.PI * 2);
     ctx.fillStyle = `rgba(255, 255, 255, ${ball.alpha})`;
+    const trailColor = `rgba(${ball.trailColor[0]}, ${ball.trailColor[1]}, ${ball.trailColor[2]}, ${ball.alpha})`;
+    if (!stroke) ctx.fillStyle = trailColor;
+
     ctx.strokeStyle = `rgba(0, 0, 0, ${ball.alpha})`;
     ctx.lineWidth = 5;
     ctx.setLineDash([]);
@@ -519,7 +522,6 @@ function drawSingleBall(ball, x, y, stroke = true) {
 
     if (stroke) ctx.stroke();
     ctx.fill();
-
 }
 
 function drawHole(hole) {
@@ -772,6 +774,7 @@ function goToLevel(levelNum) {
     location.hash = `#/${currentLevelIndex + 1}`;
     global.lastHitAngle = "";
     global.holeNumber.innerText = `${currentLevelIndex + 1}`;
+
 
 
     globalReset();
