@@ -79,7 +79,7 @@ class Level01 extends Level {
     }
 
     draw(ctx) {
-        drawSingleArrow(ctx, 250, 250, 325, 250);
+        drawArrow(ctx, 250, 250, 325, 250);
     }
 
 }
@@ -122,9 +122,13 @@ class Level04 extends Level {
 
     constructor() {
         super();
-        this.holes = [new Hole(400, 125), new Hole(400, 375)];
-        this.balls = [new Ball(50, 125), new Ball(250, 375, 0)];
+        this.holes = [new Hole(300, 125), new Hole(400, 375)];
+        this.balls = [new Ball(50, 125), new Ball(150, 375, 0)];
         this.walls = [new Wall(100, 50, 100, 200, false)];
+    }
+
+    draw(ctx) {
+        drawArrow(ctx, 50, 125, -50, 125);
     }
 }
 
@@ -153,6 +157,8 @@ class Level05 extends Level {
         ctx.lineWidth = 2;
         ctx.rect(100, 75, 20, 100);
         ctx.stroke();
+
+        drawArrow(ctx, 150, 125, 25, 125);
     }
 }
 
@@ -409,6 +415,42 @@ function hexToRgb(hex) {
         parseInt(result[2], 16),
         parseInt(result[3], 16)
     ] : null;
+}
+
+const CANVAS_WIDTH = 500;
+function drawArrow(ctx, fromx, fromy, tox, toy) {
+    drawSingleArrow(ctx, fromx, fromy, tox, toy);
+
+    const xMagnitude = Math.abs(fromx - tox);
+    const yMagnitude = Math.abs(fromy - toy);
+
+    let mirrorXStart = fromx;
+    let mirrorXEnd = tox;
+    let mirrorYStart = fromy;
+    let mirrorYEnd = toy;
+
+    if (tox < 0) {
+        mirrorXStart = fromx + CANVAS_WIDTH;
+        mirrorXEnd = mirrorXStart - xMagnitude;
+    }
+
+    if (tox > CANVAS_WIDTH) {
+        mirrorXStart = fromx - CANVAS_WIDTH;
+        mirrorXEnd = mirrorXStart + xMagnitude;
+    }
+
+    if (toy < 0) {
+        mirrorYStart = fromy + CANVAS_WIDTH;
+        mirrorYEnd = mirrorYStart - yMagnitude;
+    }
+
+    if (toy > CANVAS_WIDTH) {
+        mirrorYStart = fromy - CANVAS_WIDTH;
+        mirrorYEnd = mirrorYStart + yMagnitude;
+    }
+
+    drawSingleArrow(ctx, mirrorXStart, mirrorYStart, mirrorXEnd, mirrorYEnd);
+
 }
 
 function drawSingleArrow(ctx, fromx, fromy, tox, toy) {
