@@ -141,8 +141,8 @@ class Level05 extends Level {
 
     constructor() {
         super();
-        this.holes = [new Hole(400, 125), new Hole(400, 375)];
-        this.balls = [new Ball(150, 125), new Ball(250, 375, 0)];
+        this.holes = [new Hole(400, 125), new Hole(350, 375)];
+        this.balls = [new Ball(200, 125), new Ball(250, 375, 0)];
         this.walls = [
             new Wall(25, 0, 25, 500, false),
             new Wall(475, 0, 475, 500, false)
@@ -158,7 +158,7 @@ class Level05 extends Level {
         ctx.rect(100, 75, 20, 100);
         ctx.stroke();
 
-        drawArrow(ctx, 150, 125, 25, 125);
+        drawArrow(ctx, 200, 125, 55, 125);
     }
 }
 
