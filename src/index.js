@@ -8,7 +8,7 @@ import WallPoint from "./wall_point.js";
 import {calculateSeparation} from "./collision.js";
 import {generateLevels} from "./levels/levels.js";
 import playerSmall from "./vendor/player-small.js";
-import { hitSong, winLevelSong, wallSong, loseLevelSong, winGameSong } from "./vendor/songs.js";
+import { hitSong, winLevelSong, wallSong, loseLevelSong, winGameSong, inHoleSong } from "./vendor/songs.js";
 
 const BALL_MADE_THRESHOLD = 0.25;
 const BALL_STOPPED_THRESHOLD = 0.15
@@ -45,6 +45,7 @@ let global = {
         wall: null,
         winGame: null,
         winLevel: null,
+        winLevelAt: null,
         loseLevel: null
     }
 };
@@ -595,6 +596,18 @@ function draw() {
         if (ball.hole) continue;
         drawArrow(arrow);
     }
+
+    for (let i = 0; i < currentLevel.balls.length; i++) {
+        const ball = currentLevel.balls[i];
+        if (ball.hole) {
+            ball.hole.drawParticles(ctx);
+        }
+    }
+
+    // for (let i = 0; i < currentLevel.holes.length; i++) {
+    //     const hole = currentLevel.holes[i];
+    //     hole.drawParticles(ctx);
+    // }
 }
 
 function drawArrow(arrow) {
@@ -693,11 +706,24 @@ function drawSingleArrow(ctx, fromx, fromy, tox, toy) {
 function update(timestep) {
     currentLevel.update();
 
+    if (currentLevel.solved && global.winLevelAt === null) {
+        global.winLevelAt = Date.now();
+    }
+
+    // for (let i = 0; i < currentLevel.holes.length; i++) {
+    //     const hole = currentLevel.holes[i];
+    //     hole.emitParticles();
+    // }
+
     for (let i = 0; i < currentLevel.balls.length; i++) {
         const ball = currentLevel.balls[i];
         const arrow = arrows[i];
 
         ball.update(timestep);
+
+        if (ball.hole) {
+            ball.hole.emitParticles();
+        }
 
         for (let j = 0; j < currentLevel.balls.length; j++) {
             if (i === j) continue;
@@ -707,6 +733,8 @@ function update(timestep) {
                 resolveBallCollision(ball, otherBall);
             }
         }
+
+
 
         if (arrow) {
             arrow.startPos.x = ball.pos.x;
@@ -720,8 +748,9 @@ function update(timestep) {
         }
     }
 
+    const wonForLongEnough = global.winLevelAt !== null && (Date.now() - global.winLevelAt) > 2000;
 
-    if (currentLevel.solved && !global.transitioning && currentLevelIndex !== -1) {
+    if (currentLevel.solved && !global.transitioning && currentLevelIndex !== -1 && wonForLongEnough) {
         playSong("winLevel");
         transitionCanvas();
     }
@@ -850,6 +879,7 @@ function globalReset() {
     });
 
     global.stillAt = null;
+    global.winLevelAt = null;
     global.selectedWall = null;
     global.selectedVertex = null;
     global.inputMode = INPUT_MODES.hit;
@@ -865,8 +895,9 @@ function checkHoleCollisions(ball) {
         const distance = Math.sqrt(dx * dx + dy * dy);
         const velocityMagnitude = Math.sqrt(ball.vel.x * ball.vel.x + ball.vel.y * ball.vel.y);
 
-        if (distance <= (hole.radius - ball.radius) && velocityMagnitude < BALL_MADE_THRESHOLD) {
+        if (distance <= (hole.radius - ball.radius) && velocityMagnitude < BALL_MADE_THRESHOLD && !ball.hole) {
             ball.hole = hole;
+            playSong("inHole");
             ball.falling = true;
         } else if (circlesIntersect(ball, hole)) {
             const gravity = normalizedAmountOfCircleOverlap(ball, hole) * .2;
@@ -949,6 +980,7 @@ document.addEventListener('DOMContentLoaded', () => {
     generateSong(wallSong, "wall");
     generateSong(loseLevelSong, "loseLevel");
     generateSong(winGameSong, "winGame");
+    generateSong(inHoleSong, "inHole");
 });
 
 window.addEventListener("hashchange", () => {
