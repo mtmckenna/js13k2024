@@ -1,6 +1,6 @@
 import Ball from "../ball.js";
 import Hole from "../hole.js";
-import Wall from "../wall.js";
+import Wall, {WALL_WIDTH} from "../wall.js";
 
 export class Level {
     balls = [];
@@ -76,6 +76,10 @@ class Level01 extends Level {
         super();
         this.holes = [new Hole(400, 250)];
         this.balls = [new Ball(250, 250)];
+    }
+
+    draw(ctx) {
+        drawSingleArrow(ctx, 250, 250, 325, 250);
     }
 
 }
@@ -405,4 +409,42 @@ function hexToRgb(hex) {
         parseInt(result[2], 16),
         parseInt(result[3], 16)
     ] : null;
+}
+
+function drawSingleArrow(ctx, fromx, fromy, tox, toy) {
+    const magnitude = Math.sqrt(Math.pow(tox - fromx, 2) + Math.pow(toy - fromy, 2));
+    var headlen = Math.min(magnitude, 20);  // length of head in pixels
+    var angle = Math.atan2(toy - fromy, tox - fromx);
+    ctx.strokeStyle = "#000";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([3, 3]);
+
+    // Arrowhead
+    ctx.beginPath();
+    ctx.moveTo(tox, toy);
+    ctx.lineTo(
+        tox - headlen * Math.cos(angle - Math.PI / 6),
+        toy - headlen * Math.sin(angle - Math.PI / 6)
+    );
+    ctx.lineTo(
+        tox - headlen * Math.cos(angle + Math.PI / 6),
+        toy - headlen * Math.sin(angle + Math.PI / 6)
+    );
+    ctx.closePath();
+    ctx.stroke();
+
+    // Arrow shaft
+    ctx.beginPath();
+    ctx.moveTo(fromx, fromy);
+    // let x = tox - headlen / 2 * Math.cos(angle) - headlen * Math.cos(angle - Math.PI / 6) / 2
+    let x = tox - headlen * Math.cos(angle);
+    let y = toy - headlen * Math.sin(angle)
+
+    // subtract off overshoot from arrowhead
+    ctx.lineTo(x, y);
+
+
+    ctx.stroke();
+
+
 }

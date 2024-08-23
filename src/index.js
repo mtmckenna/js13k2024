@@ -681,7 +681,6 @@ function drawSingleArrow(ctx, fromx, fromy, tox, toy) {
     ctx.lineWidth = 2;
     ctx.stroke();
 
-
     // draw small black cirlce at from
     ctx.fillStyle = "#fff";
     ctx.beginPath();
