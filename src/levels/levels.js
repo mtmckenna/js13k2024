@@ -150,16 +150,22 @@ class Level05 extends Level {
     }
 
     draw(ctx) {
-        // draw dashed rectangle to the left of the first hole
-        ctx.beginPath();
-        ctx.setLineDash([5, 15]);
-        ctx.strokeStyle = "black";
-        ctx.lineWidth = 2;
-        ctx.rect(100, 75, 20, 100);
-        ctx.stroke();
-
+        drawRect(ctx, 100, 75, 20, 100);
         drawArrow(ctx, 200, 125, 55, 125);
     }
+}
+
+function drawRect(ctx, x, y, width, height, angle = 0) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle);
+    ctx.beginPath();
+    ctx.setLineDash([5, 15]);
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 2;
+    ctx.rect(0, 0, width, height);
+    ctx.stroke();
+    ctx.restore();
 }
 
 class Level06 extends Level {
@@ -171,13 +177,23 @@ class Level06 extends Level {
 
     constructor() {
         super();
-        this.holes = [new Hole(250, 150), new Hole(100, 350), new Hole(400, 350)];
+        const centerX = 250;
+        const centerY = 250;
+        const radius = 200;
 
+        // Calculate holes (equilateral triangle pointing upwards)
+        this.holes = [
+            new Hole(centerX, centerY - radius), // Top vertex
+            new Hole(centerX - radius * Math.cos(Math.PI / 6), centerY + radius * Math.sin(Math.PI / 6)), // Bottom left vertex
+            new Hole(centerX + radius * Math.cos(Math.PI / 6), centerY + radius * Math.sin(Math.PI / 6))  // Bottom right vertex
+        ];
+
+        // Calculate balls (equilateral triangle pointing downwards)
         const ballPos = [
-            {x: 100, y: 200},
-            {x: 400, y: 200},
-            {x: 250, y: 400}
-            ]
+            {x: centerX, y: centerY + radius}, // Bottom vertex
+            {x: centerX - radius * Math.cos(Math.PI / 6), y: centerY - radius * Math.sin(Math.PI / 6)}, // Top left vertex
+            {x: centerX + radius * Math.cos(Math.PI / 6), y: centerY - radius * Math.sin(Math.PI / 6)}  // Top right vertex
+        ];
 
         // Calculate the centroid of the triangle formed by the holes
         const centroidX = (ballPos[0].x + ballPos[1].x + ballPos[2].x) / 3;
@@ -189,11 +205,16 @@ class Level06 extends Level {
         };
 
         this.balls = [
-            new Ball(ballPos[0].x,ballPos[0].y, angleToCentroid(100, 200)),
-            new Ball(ballPos[1].x, ballPos[1].y, angleToCentroid(400, 200)),
-            new Ball(ballPos[2].x, ballPos[2].y, angleToCentroid(250, 400))
+            new Ball(ballPos[0].x,ballPos[0].y, angleToCentroid(ballPos[0].x, ballPos[0].y) - Math.PI/2),
+            new Ball(ballPos[1].x, ballPos[1].y, angleToCentroid(ballPos[1].x, ballPos[1].y) - Math.PI/2),
+            new Ball(ballPos[2].x, ballPos[2].y, angleToCentroid(ballPos[2].x, ballPos[2].y) - Math.PI/4),
         ];
+
         this.walls = [];
+    }
+
+    draw(ctx) {
+        drawRect(ctx, 350, 150, 20, 100, Math.PI/16);
     }
 }
 
@@ -221,7 +242,7 @@ class Level08 extends Level {
 
     constructor() {
         super();
-        this.holes = [new Hole(250, 250)];
+        this.holes = [new Hole(250, 250, 25)];
         const d = 150;
         this.balls = [
             new Ball(250 + d, 250, 0),
