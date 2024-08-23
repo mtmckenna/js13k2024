@@ -5,7 +5,7 @@ import WallPoint from "./wall_point.js";
 import {calculateSeparation} from "./collision.js";
 import {generateLevels} from "./levels/levels.js";
 import playerSmall from "./vendor/player-small.js";
-import { hitSong } from "./songs.js";
+import { hitSong, winLevelSong } from "./songs.js";
 
 const BALL_MADE_THRESHOLD = 0.25;
 const BALL_STOPPED_THRESHOLD = 0.15
@@ -38,7 +38,14 @@ let global = {
     lastHitAngle: "",
     currentHoleText:"",
     lastMoveLocation: {x: 0, y: 0},
-    transitioning: false
+    transitioning: false,
+    songs: {
+        hit: null,
+        wall: null,
+        winGame: null,
+        winLevelSong: null,
+        loseLevelSong: null
+    }
 };
 global.ui = document.getElementById("game-ui");
 global.title = document.getElementById("title-container");
@@ -46,18 +53,37 @@ global.holeNumber = document.getElementById("hole-number");
 global.canvasContainer = document.getElementById("canvas-container");
 global.prevButton = document.getElementById("js-prev");
 global.nextButton = document.getElementById("js-next");
+
+let generated = false;
+
 document.getElementById("js-hit-ball").addEventListener("click", (e) => {
     e.preventDefault();
     hitBallButtonClickCallback();
 
+
+    if (!generated) {
+        generateSong(hitSong, "hit");
+        generateSong(winLevelSong, "winLevel");
+        generated = true;
+    } else {
+        global.songs.winLevel.play();
+    }
+});
+
+function generateSong(song, name) {
     var player = new playerSmall();
-    player.init(hitSong);
+    player.init(song);
 
     // Generate music...
     var done = false;
 
-    setInterval(function () {
-        if (done) return;
+    let interval = setInterval(function () {
+        if (done)
+        {
+            clearInterval(interval);
+            return;
+        }
+
         done = player.generate() >= 1;
         if (done) {
             var wave = player.createWave();
@@ -65,11 +91,11 @@ document.getElementById("js-hit-ball").addEventListener("click", (e) => {
             audio.src = URL.createObjectURL(
                 new Blob([wave], { type: "audio/wav" })
             );
+            global.songs[name] = audio;
             // audio.play();
         }
     }, 0);
-
-});
+}
 
 function hitBallButtonClickCallback() {
     const el = document.getElementById("js-hit-ball");
