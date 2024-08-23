@@ -783,25 +783,19 @@ function goToLevel(levelNum) {
 
     if (levelNum ==="win") {
         document.getElementById("title").classList.add("hide");
+        document.getElementById("win").classList.remove("animated");
         document.getElementById("win").classList.remove("hide");
-        document.getElementById("win").childNodes.forEach(child => {
-            if (child.tagName === "SPAN") {
-                child.classList.remove("letter");
-                child.classList.add("letter");
-            }
-        });
+        setTimeout(() => document.getElementById("win").classList.add("animated"), 0);
+
         win();
         globalReset();
         return;
     } else if (levelNum === 1) {
         document.getElementById("win").classList.add("hide");
+        document.getElementById("title").classList.remove("animated");
         document.getElementById("title").classList.remove("hide");
-        document.getElementById("title").childNodes.forEach(child => {
-            if (child.tagName === "SPAN") {
-                child.classList.remove("letter");
-                child.classList.add("letter");
-            }
-        });
+        setTimeout(() => document.getElementById("title").classList.add("animated"), 0);
+
     } else {
         document.getElementById("win").classList.add("hide");
     }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8"/>
     <meta
@@ -159,19 +159,7 @@
         opacity: .30;
       }
 
-      #title-container {
-        /*position: absolute;*/
-        /*display: flex;*/
-        /*justify-content: start;*/
-        /*align-items: flex-start;*/
-        /*color: white;*/
-        /*-webkit-text-stroke: 2px black;*/
-        /*top: 40px;*/
-        /*transition: opacity 1s ease-in-out;*/
-        /*z-index: 2;*/
-      }
-
-      .letter {
+      .animated .letter {
         font-size: 5rem;
         font-weight: bold;
         position: relative;
@@ -274,7 +262,6 @@
         align-items: flex-start;
         color: white;
         -webkit-text-stroke: 2px black;
-        /*top: 40px;*/
         transition: opacity 1s ease-in-out;
         z-index: 2;
       }
@@ -298,7 +285,7 @@
       <div id="hole-number"></div>
 
     </div>
-      <div id="title">
+      <div id="title" class="animated">
         <span class="letter">E</span>
         <span class="letter">n</span>
         <span class="letter">t</span>
@@ -311,15 +298,15 @@
       </div>
 
       <div id="win" class="hide">
-        <span>G</span>
-        <span>o</span>
-        <span>o</span>
-        <span>d</span>
-        <span>&nbsp;</span>
-        <span>J</span>
-        <span>o</span>
-        <span>b</span>
-        <span>!</span>
+        <span class="letter">G</span>
+        <span class="letter">o</span>
+        <span class="letter">o</span>
+        <span class="letter">d</span>
+        <span class="letter">&nbsp;</span>
+        <span class="letter">J</span>
+        <span class="letter">o</span>
+        <span class="letter">b</span>
+        <span class="letter">!</span>
       </div>
     <div id="top-container">
       <div class="button" id="js-prev"><span class="button-label">Previous</span></div>
