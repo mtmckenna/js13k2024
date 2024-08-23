@@ -1,3 +1,6 @@
+// ignore this file for code analysis in webstorm
+
+
 import Joystick  from "./joystick.js";
 import Wall from "./wall.js";
 import Arrow from "./arrow.js";
@@ -5,7 +8,7 @@ import WallPoint from "./wall_point.js";
 import {calculateSeparation} from "./collision.js";
 import {generateLevels} from "./levels/levels.js";
 import playerSmall from "./vendor/player-small.js";
-import { hitSong, winLevelSong } from "./songs.js";
+import { hitSong, winLevelSong, wallSong, loseLevelSong, winGameSong } from "./vendor/songs.js";
 
 const BALL_MADE_THRESHOLD = 0.25;
 const BALL_STOPPED_THRESHOLD = 0.15
@@ -13,8 +16,6 @@ const MIN_WALL_LENGTH = 2;
 
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
-
-
 
 const INPUT_MODES = {
     hit: 1 << 0,        // 00001
@@ -43,8 +44,8 @@ let global = {
         hit: null,
         wall: null,
         winGame: null,
-        winLevelSong: null,
-        loseLevelSong: null
+        winLevel: null,
+        loseLevel: null
     }
 };
 global.ui = document.getElementById("game-ui");
@@ -54,27 +55,15 @@ global.canvasContainer = document.getElementById("canvas-container");
 global.prevButton = document.getElementById("js-prev");
 global.nextButton = document.getElementById("js-next");
 
-let generated = false;
-
 document.getElementById("js-hit-ball").addEventListener("click", (e) => {
     e.preventDefault();
     hitBallButtonClickCallback();
-
-
-    if (!generated) {
-        generateSong(hitSong, "hit");
-        generateSong(winLevelSong, "winLevel");
-        generated = true;
-    } else {
-        global.songs.winLevel.play();
-    }
 });
 
 function generateSong(song, name) {
     var player = new playerSmall();
     player.init(song);
 
-    // Generate music...
     var done = false;
 
     let interval = setInterval(function () {
@@ -88,11 +77,12 @@ function generateSong(song, name) {
         if (done) {
             var wave = player.createWave();
             var audio = document.createElement("audio");
+            audio.preload = "auto";
             audio.src = URL.createObjectURL(
                 new Blob([wave], { type: "audio/wav" })
             );
+
             global.songs[name] = audio;
-            // audio.play();
         }
     }, 0);
 }
@@ -154,9 +144,6 @@ currentLevel.reset();
 let nextLevel = levels[nextLevelIndex];
 
 const arrows = [];
-const MAX_CIRCLE_RADIUS = Math.hypot(canvas.width, canvas.height) / 2;
-// let currentCircleRadius = MAX_CIRCLE_RADIUS;
-// const CIRCLE_SHRINK_RATE = 5;
 const joystick = new Joystick(canvas, clickCallback, releaseCallback, moveCallback);
 
 let wallPoint = new WallPoint();
@@ -236,6 +223,7 @@ function translateCanvasContainer(magnitude, angle) {
 
 function hitBallReleaseCallback() {
     if (arrows.length === 0) return;
+    playSong("hit");
     for (let i = 0; i < currentLevel.balls.length; i++) {
         const ball = currentLevel.balls[i];
         if (ball.hole) continue;
@@ -718,6 +706,7 @@ function update(timestep) {
 
 
     if (currentLevel.solved && !global.transitioning) {
+        playSong("winLevel");
         transitionCanvas();
     }
 
@@ -735,6 +724,7 @@ function update(timestep) {
             if (global.stillAt !== null && Date.now() - global.stillAt > 1000) {
                 currentLevelReset();
                 globalReset();
+                playSong("loseLevel");
             }
         }
     }
@@ -757,6 +747,7 @@ function checkWallCollision(ball) {
         if (collision) {
             const speed = Math.hypot(ball.vel.x, ball.vel.y) * .5;
             wall.collided(speed);
+            playSong("wall");
             triggerShake(Math.random() * Math.PI * 2, true);
             // bounce ball based on angle of collision.
             ball.pos.x += collision.mtv.x;
@@ -856,6 +847,8 @@ function checkHoleCollisions(ball) {
     if (!ball.falling) ball.alpha = 1.0;
 }
 
+window.playSong = playSong;
+
 const FIXED_TIMESTEP = 1000 / 60;  // 60 updates per second
 let accumulatedTime = 0;
 let lastTime = 0;
@@ -901,10 +894,22 @@ function getTextColorForBackground(r, g, b) {
     return brightness > 128 ? 'black' : 'white';
 }
 
+function playSong(name) {
+    if (global.songs[name]) {
+        global.songs[name].currentTime = 0;
+        global.songs[name].play();
+
+    }
+}
+
 loop(0);
 document.addEventListener('DOMContentLoaded', () => {
     goToLevel(getLevelFromHash());
     hitBallButtonClickCallback();
+    generateSong(hitSong, "hit");
+    generateSong(winLevelSong, "winLevel");
+    generateSong(wallSong, "wall");
+    generateSong(loseLevelSong, "loseLevel");
     // document.getElementById("js-hit-ball").click();
 });
 
