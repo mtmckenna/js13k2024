@@ -97,6 +97,7 @@
         padding: 0 20px;
         align-items: center;
         text-align: center;
+        z-index: 2;
       }
 
       .button-container {
@@ -240,7 +241,7 @@
       }
 
       .hide {
-        opacity: 0;
+        display: none;
       }
 
       #title {
@@ -250,7 +251,6 @@
         align-items: flex-start;
         color: white;
         -webkit-text-stroke: 2px black;
-        top: 40px;
         transition: opacity 1s ease-in-out;
         z-index: 2;
       }
@@ -285,7 +285,7 @@
       <div id="hole-number"></div>
 
     </div>
-      <div id="title" class="animated">
+      <div id="title" class="animated" style="display:none;">
         <span class="letter">E</span>
         <span class="letter">n</span>
         <span class="letter">t</span>
@@ -297,7 +297,7 @@
         <span class="letter">f</span>
       </div>
 
-      <div id="win" class="hide">
+      <div id="win" class="hide" style="display:none;">
         <span class="letter">G</span>
         <span class="letter">o</span>
         <span class="letter">o</span>

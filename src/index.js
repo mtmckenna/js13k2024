@@ -148,7 +148,8 @@ currentLevel.reset();
 let nextLevel = levels[nextLevelIndex];
 
 const arrows = [];
-const joystick = new Joystick(canvas, clickCallback, releaseCallback, moveCallback);
+// const joystick = new Joystick(canvas, clickCallback, releaseCallback, moveCallback);
+let joystick = null;
 
 let wallPoint = new WallPoint();
 
@@ -809,24 +810,29 @@ function checkWallCollision(ball) {
 }
 
 function goToLevel(levelNum) {
-
     if (levelNum ==="win") {
-        document.getElementById("title").classList.add("hide");
+        document.getElementById("title").style.display = "none";
+        document.getElementById("win").style.display = null;
         document.getElementById("win").classList.remove("animated");
-        document.getElementById("win").classList.remove("hide");
         setTimeout(() => document.getElementById("win").classList.add("animated"), 0);
 
         win();
         globalReset();
         return;
-    } else if (levelNum === 1) {
-        document.getElementById("win").classList.add("hide");
+    } else if (levelNum === 1 && !joystick) {
+        document.getElementById("win").style.display = "none";
         document.getElementById("title").classList.remove("animated");
-        document.getElementById("title").classList.remove("hide");
-        setTimeout(() => document.getElementById("title").classList.add("animated"), 0);
+        document.getElementById("title").style.display = "none";
+
+        setTimeout(() => {
+            document.getElementById("title").style.display = null;
+            document.getElementById("title").classList.add("animated")
+        }, 0);
 
     } else {
-        document.getElementById("win").classList.add("hide");
+        // document.getElementById("win").classList.add("hide");
+        console.log("fart");
+        document.getElementById("win").style.display = "none";
     }
 
     currentLevelIndex = (levelNum - 1) % levels.length;
@@ -990,6 +996,12 @@ window.addEventListener("hashchange", () => {
 
 document.body.addEventListener("click", () => {
     document.getElementById("title").classList.add("hide");
+    document.getElementById("title").style.opacity = 0;
+
+    if (!joystick) {
+        playSong("winGame");
+        joystick = new Joystick(canvas, clickCallback, releaseCallback, moveCallback);
+    }
 });
 
 document.body.addEventListener("touchstart", () => {
