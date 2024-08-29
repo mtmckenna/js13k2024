@@ -90,7 +90,6 @@ export default class Joystick {
         e.preventDefault();
         this.setCurrentPosFromEvent(e);
         this.inputMoved(this.xPosFromEvent(e), this.yPosFromEvent(e));
-        console.log(this.pressed);
     }
 
     mousePressed(e) {

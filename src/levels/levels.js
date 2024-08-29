@@ -1,6 +1,6 @@
 import Ball from "../ball.js";
 import Hole from "../hole.js";
-import Wall from "../wall.js";
+import Wall, {WALL_WIDTH} from "../wall.js";
 import { global } from "../index.js";
 
 export class Level {
@@ -99,6 +99,11 @@ class Level02 extends Level {
         this.holes = [new Hole(400, 125), new Hole(400, 375)];
         this.balls = [new Ball(250, 125), new Ball(250, 375)];
     }
+
+    draw(ctx) {
+        if (!global.hints) return;
+        drawArrow(ctx, 250, 125, 325, 125);
+    }
 }
 
 class Level03 extends Level {
@@ -112,6 +117,11 @@ class Level03 extends Level {
         super();
         this.holes = [new Hole(100, 125), new Hole(400, 375)];
         this.balls = [new Ball(250, 125), new Ball(250, 375, 0)];
+    }
+
+    draw(ctx) {
+        if (!global.hints) return;
+        drawArrow(ctx, 250, 125, 175, 125);
     }
 }
 
@@ -199,7 +209,8 @@ class Level06 extends Level {
         const ballPos = [
             {x: centerX, y: centerY + radius}, // Bottom vertex
             {x: centerX - radius * Math.cos(Math.PI / 6), y: centerY - radius * Math.sin(Math.PI / 6)}, // Top left vertex
-            {x: centerX + radius * Math.cos(Math.PI / 6), y: centerY - radius * Math.sin(Math.PI / 6)}  // Top right vertex
+            {x: centerX + radius * Math.cos(Math.PI / 6), y: centerY - radius * Math.sin(Math.PI / 6)},  // Top right vertex
+
         ];
 
         // Calculate the centroid of the triangle formed by the holes
@@ -212,17 +223,21 @@ class Level06 extends Level {
         };
 
         this.balls = [
-            new Ball(ballPos[0].x,ballPos[0].y, angleToCentroid(ballPos[0].x, ballPos[0].y) - Math.PI/2),
-            new Ball(ballPos[1].x, ballPos[1].y, angleToCentroid(ballPos[1].x, ballPos[1].y) - Math.PI/2),
-            new Ball(ballPos[2].x, ballPos[2].y, angleToCentroid(ballPos[2].x, ballPos[2].y) - Math.PI/4),
+            new Ball(ballPos[0].x, ballPos[0].y, angleToCentroid(ballPos[0].x, ballPos[0].y) - Math.PI/2),
+            new Ball(ballPos[1].x,ballPos[1].y, angleToCentroid(ballPos[1].x, ballPos[1].y) - Math.PI/2),
+            new Ball(ballPos[2].x, ballPos[2].y, angleToCentroid(ballPos[2].x, ballPos[2].y) - Math.PI/2),
+
         ];
 
-        this.walls = [];
+        this.walls = [
+        ];
     }
 
     draw(ctx) {
         if (global.hints) {
-            drawRect(ctx, 350, 150, 20, 100, Math.PI/16);
+            drawRect(ctx, this.balls[0].originalPos.x - 50 - WALL_WIDTH, 150, 20, 100, 0);
+            drawRect(ctx, this.balls[0].originalPos.x + 50, 150, 20, 100, 0);
+            drawArrow(ctx, this.balls[0].originalPos.x, this.balls[0].originalPos.y, this.balls[0].originalPos.x, 275);
         }
     }
 }
