@@ -373,8 +373,20 @@ class Level11 extends Level {
 
         ];
         this.walls = [
-            // new Wall(100, 200, 200, 100, false),
         ];
+    }
+
+    draw(ctx) {
+        if (!global.hints) return;
+        drawArrow(ctx, 250, 200, 250, 375);
+        drawRect(ctx, 250 - 25 - WALL_WIDTH, 200, 20, 200, 0);
+        drawRect(ctx, 250 + 25, 200, 20, 200, 0);
+
+        drawRect(ctx, 450, 150, 20, 100, 0);
+        drawRect(ctx, 400, 10, 20, 100, Math.PI/4);
+
+        drawRect(ctx, 50 - WALL_WIDTH, 150, 20, 100, 0);
+        drawRect(ctx, 100 - WALL_WIDTH, 10, 20, 100, -Math.PI/4);
     }
 }
 
