@@ -847,6 +847,12 @@ function goToLevel(levelNum) {
         document.getElementById("win").style.display = "none";
     }
 
+    if (levelNum === 13) {
+        document.getElementById("js-hints").classList.add("disabled");
+    } else {
+        document.getElementById("js-hints").classList.remove("disabled");
+    }
+
     currentLevelIndex = (levelNum - 1) % levels.length;
     const nextLevelIndex = (currentLevelIndex + 1) % levels.length;
     currentLevel = levels[currentLevelIndex];
