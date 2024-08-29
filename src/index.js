@@ -390,7 +390,7 @@ function moveHitBallCallback() {
 
         angleOffset = ball.startAngle;
 
-        const angle = angleOffset + angleFromJoystick(joystick);
+        const angle = angleOffset + angleFromJoystick(joystick) * ball.angleDir;
 
         const magnitude = calculateMagnitude(
             joystick.innerPos.x,

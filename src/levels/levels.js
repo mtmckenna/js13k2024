@@ -403,9 +403,11 @@ class Level12 extends Level {
             new Hole(200, 200),
             new Hole(300, 200),
         ];
+
+        // const angle = Math.atan2(250 - 200, 400 - 300);
         this.balls = [
             new Ball(100, 250, Math.PI),
-            new Ball(400, 250, Math.PI/3),
+            new Ball(400, 250, 0, 8, true, -1),
         ];
         this.walls = [
             new Wall(125, 125, 175, 300, false),
@@ -420,6 +422,13 @@ class Level12 extends Level {
             new Wall(200, 275, 300, 275, false),
 
         ];
+    }
+
+    draw(ctx) {
+        if (!global.hints) return;
+        drawArrow(ctx, 100, 250, 200, 200);
+        drawRect(ctx, 50, 200, 100, 20, 1.35);
+        drawRect(ctx, 430, 300, 100, 20, -1.35);
     }
 }
 

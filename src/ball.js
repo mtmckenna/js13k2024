@@ -3,7 +3,7 @@ export default class Ball {
   mass = 1;
   numLastPositions = 50;
   
-  constructor(x, y, startAngle = Math.PI, radius = 8, realBall = true) {
+  constructor(x, y, startAngle = Math.PI, radius = 8, realBall = true, angleDir = 1) {
     this.radius = radius;
     this.color = "#fff";
     this.trailColor = "#fff";
@@ -21,6 +21,7 @@ export default class Ball {
     this.tick = 0;
     this.lastPosIndex = 0;
     this.hit = false;
+    this.angleDir = angleDir;
 
     if (realBall) {
       for (let i = 0; i < this.numLastPositions; i++) {
