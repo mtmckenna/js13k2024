@@ -338,9 +338,17 @@ class Level10 extends Level {
             new Ball(300, 300, -Math.PI/2),
         ];
         this.walls = [
-            // new Wall(300, 400, 400, 300, false),
             new Wall(100, 200, 200, 100, false),
         ];
+    }
+
+    draw(ctx) {
+        if (!global.hints) return;
+        drawArrow(ctx, 250, 250, 130, 130);
+        drawRect(ctx, 310, 230, 20, 100, Math.PI/4);
+        drawRect(ctx, 340, 200, 20, 100, -Math.PI/4);
+        drawRect(ctx, 240, 325, 20, 100, 0);
+        drawRect(ctx, 300, 440, 100, 20, 0);
     }
 }
 
