@@ -28,7 +28,7 @@ const INPUT_MODES = {
     moving: (1 << 1) | (1 << 2) | (1 << 4)
 };
 
-let global = {
+export let global = {
     stillAt: null,
     selectedWall: null,
     selectedVertex: null,
@@ -40,6 +40,7 @@ let global = {
     currentHoleText:"",
     lastMoveLocation: {x: 0, y: 0},
     transitioning: false,
+    hints: true,
     songs: {
         hit: null,
         wall: null,
@@ -59,6 +60,24 @@ document.getElementById("js-hit-ball").addEventListener("click", (e) => {
     e.preventDefault();
     hitBallButtonClickCallback();
 });
+
+document.getElementById("js-hints").addEventListener("click", (e) => {
+    e.preventDefault();
+    global.hints = !global.hints;
+    updateHintUi();
+});
+
+function updateHintUi() {
+    const hints = document.getElementById("js-hints");
+    hints.innerText = global.hints ? "Hints On" : "Hints Off";
+    if (global.hints) {
+        hints.style.boxShadow = `0 2px ${currentLevel.cssButtonShadowColor}`;
+        hints.classList.add("active");
+    } else {
+        hints.style.boxShadow = `0 5px ${currentLevel.cssButtonShadowColor}`;
+        hints.classList.remove("active");
+    }
+}
 
 function generateSong(song, name) {
     var player = new playerSmall();
@@ -256,7 +275,7 @@ function hitBallReleaseCallback() {
     resetButton.classList.remove("disabled");
 
     Array.from(document.getElementsByClassName("button")).forEach(button => {
-        if (button.id === "js-reset") return;
+        if (button.id === "js-reset" || button.id === "js-hints") return;
         button.style.backgroundColor = null;
         button.style.boxShadow = null;
     });
@@ -604,11 +623,6 @@ function draw() {
             ball.hole.drawParticles(ctx);
         }
     }
-
-    // for (let i = 0; i < currentLevel.holes.length; i++) {
-    //     const hole = currentLevel.holes[i];
-    //     hole.drawParticles(ctx);
-    // }
 }
 
 function drawArrow(arrow) {
@@ -830,8 +844,6 @@ function goToLevel(levelNum) {
         }, 0);
 
     } else {
-        // document.getElementById("win").classList.add("hide");
-        console.log("fart");
         document.getElementById("win").style.display = "none";
     }
 
@@ -870,7 +882,14 @@ function globalReset() {
 
     Array.from(document.getElementsByClassName("button")).forEach(button => {
             let backgroundColor = currentLevel.cssButtonColor;
+
             let shadowColor = `0 5px ${currentLevel.cssButtonShadowColor}`;
+
+            if (button.classList.contains("active")) {
+                shadowColor = `0 2px ${currentLevel.cssButtonShadowColor}`;
+            }
+
+
             let textColor = getTextColorForBackground(...hexToRgb(currentLevel.cssButtonColor));
 
             if (!button.classList.contains("disabled")) {
@@ -987,6 +1006,7 @@ document.addEventListener('DOMContentLoaded', () => {
     generateSong(loseLevelSong, "loseLevel");
     generateSong(winGameSong, "winGame");
     generateSong(inHoleSong, "inHole");
+    updateHintUi();
 });
 
 window.addEventListener("hashchange", () => {

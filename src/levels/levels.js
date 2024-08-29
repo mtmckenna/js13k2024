@@ -1,6 +1,7 @@
 import Ball from "../ball.js";
 import Hole from "../hole.js";
-import Wall, {WALL_WIDTH} from "../wall.js";
+import Wall from "../wall.js";
+import { global } from "../index.js";
 
 export class Level {
     balls = [];
@@ -79,7 +80,9 @@ class Level01 extends Level {
     }
 
     draw(ctx) {
-        drawArrow(ctx, 250, 250, 325, 250);
+        if (global.hints) {
+            drawArrow(ctx, 250, 250, 325, 250);
+        }
     }
 
 }
@@ -128,7 +131,9 @@ class Level04 extends Level {
     }
 
     draw(ctx) {
-        drawArrow(ctx, 50, 125, -50, 125);
+        if (global.hints) {
+            drawArrow(ctx, 50, 125, -50, 125);
+        }
     }
 }
 
@@ -150,8 +155,10 @@ class Level05 extends Level {
     }
 
     draw(ctx) {
-        drawRect(ctx, 100, 75, 20, 100);
-        drawArrow(ctx, 200, 125, 55, 125);
+        if (global.hints) {
+            drawRect(ctx, 100, 75, 20, 100);
+            drawArrow(ctx, 200, 125, 55, 125);
+        }
     }
 }
 
@@ -214,7 +221,9 @@ class Level06 extends Level {
     }
 
     draw(ctx) {
-        drawRect(ctx, 350, 150, 20, 100, Math.PI/16);
+        if (global.hints) {
+            drawRect(ctx, 350, 150, 20, 100, Math.PI/16);
+        }
     }
 }
 
