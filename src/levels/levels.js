@@ -255,6 +255,13 @@ class Level07 extends Level {
         this.balls = [new Ball(150, 150), new Ball(250, 200), new Ball(350, 250)];
         this.walls = [];
     }
+
+    draw(ctx) {
+        if (!global.hints) return;
+        drawArrow(ctx, 150, 150, 150, 265);
+        drawRect(ctx, 215, 440, 70, 20, 0);
+        drawRect(ctx, 315, 460, 70, 20, 0);
+    }
 }
 
 class Level08 extends Level {
@@ -272,6 +279,12 @@ class Level08 extends Level {
             new Ball(250 + d, 250, 0),
             new Ball(250 + d * Math.cos(Math.PI), 250 + d * Math.sin(Math.PI), Math.PI),
         ];
+    }
+
+    draw(ctx) {
+        if (!global.hints) return;
+        const from = 250 + 150 * Math.cos(Math.PI);
+        drawArrow(ctx, from, 250, from+60, 250);
     }
 }
 
@@ -296,6 +309,14 @@ class Level09 extends Level {
             new Wall(200, 200, 300, 300, false),
             new Wall(300, 200, 200, 300, false),
         ];
+    }
+
+    draw(ctx) {
+        if (!global.hints) return;
+        drawRect(ctx, 260, 120, 100, 20, Math.PI/4);
+        drawArrow(ctx, 250, 200, 200, 250);
+        drawRect(ctx, 250 + 75, 225, 20, 75, 0);
+        drawRect(ctx, 250 + 75/2, 325, 20, 75, Math.PI/2);
     }
 }
 
